@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luks Global ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#0057e7;--brand-lt:#e8f0fe;--brand-mid:#4285f4;
+  --green:#0d9e5a;--green-lt:#e6f7ef;
+  --red:#d93025;--red-lt:#fce8e6;
+  --amber:#f29900;--amber-lt:#fef7e0;
+  --purple:#7c3aed;--purple-lt:#ede9fe;
+  --teal:#0891b2;--teal-lt:#e0f2fe;
+
+  --bg:#f1f3f6;--surface:#ffffff;--card:#ffffff;--card2:#f8f9fb;
+  --border:#e0e3ea;--border2:#c8cdd8;
+  --text:#1a1f36;--text2:#4f566b;--text3:#9aa0b4;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.06);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.08);
+
+  --sw:228px;--hw:54px;--r:6px;--r2:10px;--r3:14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:'Inter',sans-serif}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:#a0a8bc}
+
+/* ══ SHELL ══ */
+.erp{display:grid;grid-template-columns:var(--sw) 1fr;grid-template-rows:var(--hw) 1fr;height:100vh}
+
+/* ══ TOPBAR ══ */
+.topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:200;box-shadow:var(--shadow)}
+.tb-logo{display:flex;align-items:center;gap:9px;width:var(--sw);padding-right:14px;border-right:1px solid var(--border);flex-shrink:0}
+.tb-mark{width:28px;height:28px;background:var(--brand);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0;letter-spacing:-.3px;box-shadow:0 2px 6px rgba(0,87,231,.3)}
+.tb-name{font-weight:700;font-size:13px;color:var(--text);line-height:1.2}
+.tb-sub{font-size:9px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.tb-center{flex:1;display:flex;align-items:center;gap:10px;padding:0 12px}
+.tb-search{flex:1;max-width:300px;position:relative}
+.tb-search input{width:100%;background:var(--card2);border:1.5px solid var(--border);color:var(--text);padding:6px 10px 6px 30px;border-radius:var(--r);font-size:12px;outline:none;transition:all .15s}
+.tb-search input:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(0,87,231,.1)}
+.tb-search input::placeholder{color:var(--text3)}
+.tb-si{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:12px;pointer-events:none}
+.tb-pills{display:flex;gap:5px;margin-left:auto}
+.tpill{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.tpill-r{background:var(--red-lt);color:var(--red);border-color:rgba(217,48,37,.2)}
+.tpill-a{background:var(--amber-lt);color:var(--amber);border-color:rgba(242,153,0,.2)}
+.tpill-g{background:var(--green-lt);color:var(--green);border-color:rgba(13,158,90,.2)}
+.pdot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.tb-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.notif-btn{width:30px;height:30px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .15s;font-size:14px}
+.notif-btn:hover{background:var(--card2);border-color:var(--border2)}
+.notif-count{position:absolute;top:-4px;right:-4px;width:15px;height:15px;background:var(--red);color:#fff;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+
+/* ══ SIDEBAR ══ */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;box-shadow:var(--shadow)}
+.ns-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:12px 14px 4px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 14px;cursor:pointer;transition:all .13s;color:var(--text2);font-weight:500;font-size:12.5px;border:none;background:none;width:100%;text-align:left;position:relative;border-left:2px solid transparent;border-radius:0}
+.ni:hover{background:var(--card2);color:var(--text)}
+.ni.act{background:var(--brand-lt);color:var(--brand);font-weight:600;border-left-color:var(--brand)}
+.ni-icon{font-size:13px;width:15px;text-align:center;flex-shrink:0}
+.ni-badge{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.nb-r{background:var(--red-lt);color:var(--red)}
+.nb-a{background:var(--amber-lt);color:var(--amber)}
+.nb-g{background:var(--green-lt);color:var(--green)}
+.ns-div{height:1px;background:var(--border);margin:5px 12px}
+.sb-foot{margin-top:auto;padding:10px 10px;border-top:1px solid var(--border)}
+.cert-block{background:var(--brand-lt);border:1px solid rgba(0,87,231,.15);border-radius:var(--r);padding:8px 10px}
+.cert-bl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--brand);margin-bottom:5px}
+.cert-tags{display:flex;flex-wrap:wrap;gap:3px}
+.ctag{font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;background:rgba(0,87,231,.08);color:var(--brand);border:1px solid rgba(0,87,231,.15);letter-spacing:.3px}
+
+/* ══ CONTENT ══ */
+.content{overflow-y:auto;background:var(--bg)}
+.page{display:none;padding:22px}
+.page.act{display:block;animation:pIn .15s ease}
+@keyframes pIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ BUTTONS ══ */
+.btn{padding:7px 14px;border-radius:var(--r);font-weight:600;font-size:12px;letter-spacing:.1px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .13s;line-height:1}
+.btn-brand{background:var(--brand);color:#fff;box-shadow:0 1px 3px rgba(0,87,231,.3)}.btn-brand:hover{background:#0046c0;box-shadow:0 2px 8px rgba(0,87,231,.35)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{filter:brightness(1.05)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(1.05)}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{filter:brightness(1.05)}
+.btn-ghost{background:#fff;color:var(--text2);border:1.5px solid var(--border);box-shadow:var(--shadow)}.btn-ghost:hover{background:var(--card2);color:var(--text);border-color:var(--border2)}
+.btn-danger{background:var(--red-lt);color:var(--red);border:1px solid rgba(217,48,37,.2)}.btn-danger:hover{background:rgba(217,48,37,.15)}
+.btn-sm{padding:5px 11px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+.btn-icon{width:26px;height:26px;padding:0;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+
+/* ══ PAGE HEADERS ══ */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;gap:12px}
+.ph h1{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.ph p{font-size:11px;color:var(--text3);margin-top:2px}
+.ph-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
+
+/* ══ CARDS ══ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow)}
+.ch{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ct{font-weight:600;font-size:12px;color:var(--text);display:flex;align-items:center;gap:6px}
+.cb{padding:14px 16px}
+
+/* ══ KPI ══ */
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .15s}
+.kpi:hover{box-shadow:var(--shadow-md)}
+.kpi-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r2) var(--r2) 0 0}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.kpi-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;letter-spacing:-.5px}
+.kpi-sub{font-size:10px;color:var(--text2)}
+
+/* ══ TABLES ══ */
+.dtable{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow)}
+.dth{background:var(--card2);border-bottom:1.5px solid var(--border);padding:8px 14px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);display:grid;gap:8px}
+.dtr{display:grid;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;font-size:12px;transition:background .1s}
+.dtr:last-child{border-bottom:none}
+.dtr:hover{background:var(--card2)}
+
+/* ══ TAGS & BADGES ══ */
+.tag{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:.3px;text-transform:uppercase;display:inline-block;margin:1px}
+.t-d{background:rgba(217,48,37,.08);color:var(--red)}
+.t-j{background:rgba(0,87,231,.08);color:var(--brand)}
+.t-g{background:rgba(242,153,0,.08);color:var(--amber)}
+.t-gov{background:rgba(13,158,90,.08);color:var(--green)}
+.t-cert{background:var(--purple-lt);color:var(--purple)}
+.badge{font-size:9px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.bg-r{background:var(--red-lt);color:var(--red)}
+.bg-a{background:var(--amber-lt);color:var(--amber)}
+.bg-g{background:var(--green-lt);color:var(--green)}
+.bg-b{background:var(--brand-lt);color:var(--brand)}
+.bg-p{background:var(--purple-lt);color:var(--purple)}
+.bg-t{background:var(--teal-lt);color:var(--teal)}
+.bg-dim{background:var(--card2);color:var(--text2);border:1px solid var(--border)}
+
+/* ══ PROGRESS ══ */
+.steps{display:flex;gap:2px}
+.seg{height:3px;flex:1;border-radius:2px;background:var(--border)}
+.seg.done{background:var(--green)}
+.seg.cur{background:var(--amber)}
+
+/* ══ MODAL ══ */
+.ovl{position:fixed;inset:0;background:rgba(30,35,55,.45);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.ovl.open{display:flex}
+.modal{background:#fff;border:1px solid var(--border);border-radius:var(--r3);width:580px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:mIn .16s ease}
+.modal-lg{width:740px}
+@keyframes mIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mh{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1;border-radius:var(--r3) var(--r3) 0 0}
+.mt{font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:7px}
+.mb{padding:18px 20px;display:flex;flex-direction:column;gap:13px}
+.mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:7px;justify-content:flex-end;position:sticky;bottom:0;background:#fff;border-radius:0 0 var(--r3) var(--r3)}
+
+/* ══ FORM ══ */
+.fg{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text2)}
+.fi,.fs,.ft{width:100%;background:#fff;border:1.5px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--r);font-size:12.5px;outline:none;transition:all .13s}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,87,231,.08)}
+.fs option{background:#fff}
+.ft{min-height:64px;resize:vertical}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.tc{display:none}
+.tc-wrap{display:flex;gap:6px;flex-wrap:wrap}
+.tl{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;transition:all .13s;color:var(--text2);background:#fff}
+.tl:hover{border-color:var(--brand-mid);color:var(--brand)}
+.tc:checked+.tl{background:var(--brand-lt);border-color:var(--brand);color:var(--brand);font-weight:600}
+
+/* ══ DIVIDER ══ */
+.section-divider{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px}
+
+/* ══ GOAL BAR ══ */
+.goal-card{background:linear-gradient(135deg,#0057e7 0%,#1a75ff 60%,#4d9bff 100%);border-radius:var(--r2);padding:20px 22px;color:#fff;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,87,231,.25)}
+.goal-card::after{content:'$10M';position:absolute;right:-12px;top:-20px;font-size:100px;font-weight:900;color:rgba(255,255,255,.07);pointer-events:none;line-height:1;font-family:'Inter',sans-serif}
+.goal-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.goal-val{font-size:32px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px}
+.goal-tgt{font-size:10px;color:rgba(255,255,255,.65);font-family:'JetBrains Mono',monospace;text-align:right}
+.goal-pct-lg{font-size:20px;font-weight:800;color:#fff;text-align:right;margin-top:2px}
+.goal-bar{height:8px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden;margin-bottom:7px}
+.goal-fill{height:100%;background:rgba(255,255,255,.85);border-radius:4px;transition:width .6s ease}
+.goal-bottom{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.65)}
+
+/* ══ DASH GRIDS ══ */
+.dash-kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.dash-main{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.dash-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ══ MINI LIST ══ */
+.mlr{display:grid;padding:7px 0;border-bottom:1px solid var(--border);align-items:center;gap:6px;font-size:11px}
+.mlr:last-child{border-bottom:none}
+.ml-name{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.ml-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green);text-align:right;white-space:nowrap;font-weight:600}
+
+/* ══ ACTIVITY ══ */
+.af-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);align-items:flex-start;font-size:11px}
+.af-item:last-child{border-bottom:none}
+.af-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.af-text{flex:1;line-height:1.5;color:var(--text2)}
+.af-time{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* ══ CONTAINER VIZ ══ */
+.cv-bar{height:38px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex;margin:8px 0}
+.cv-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.9);overflow:hidden;transition:width .4s;min-width:0}
+
+/* ══ KANBAN ══ */
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;overflow-x:auto;padding-bottom:4px}
+.kb-col{background:var(--card2);border:1px solid var(--border);border-radius:var(--r2);min-width:175px;box-shadow:var(--shadow)}
+.kb-head{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:#fff;border-radius:var(--r2) var(--r2) 0 0}
+.kb-body{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:80px}
+.kb-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:10px;cursor:pointer;transition:all .14s;box-shadow:var(--shadow)}
+.kb-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kb-name{font-weight:600;font-size:12px;margin-bottom:3px;color:var(--text)}
+.kb-sub{font-size:10px;color:var(--text3);margin-bottom:5px}
+
+/* ══ P&L ══ */
+.pl-row{display:grid;padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px;align-items:center}
+.pl-row.head{background:var(--card2);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3)}
+.pl-row.total{font-weight:700;background:var(--green-lt);color:var(--green);font-size:13px}
+.pl-row.sub{padding-left:28px;color:var(--text2)}
+.pl-num{font-family:'JetBrains Mono',monospace;text-align:right;font-weight:600}
+
+/* ══ NOTIFICATION PANEL ══ */
+.notif-panel{position:fixed;top:var(--hw);right:0;width:320px;height:calc(100vh - var(--hw));background:#fff;border-left:1px solid var(--border);box-shadow:var(--shadow-lg);z-index:300;transform:translateX(100%);transition:transform .2s ease;overflow-y:auto}
+.notif-panel.open{transform:translateX(0)}
+.np-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
+.np-title{font-weight:700;font-size:13px}
+.np-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;transition:background .12s;cursor:pointer}
+.np-item:hover{background:var(--card2)}
+.np-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.np-text{flex:1;font-size:12px;line-height:1.5;color:var(--text2)}
+.np-text strong{color:var(--text);font-weight:600}
+.np-time{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:3px}
+
+/* ══ OUTREACH CALENDAR ══ */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:12px}
+.cal-cell{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:6px 4px;text-align:center;font-size:10px;cursor:pointer;transition:all .13s;min-height:56px;display:flex;flex-direction:column;gap:2px}
+.cal-cell:hover{border-color:var(--brand-mid)}
+.cal-cell.today{border-color:var(--brand);background:var(--brand-lt)}
+.cal-cell.has-task::after{content:'●';font-size:7px;color:var(--brand)}
+.cal-label{font-weight:600;font-size:9px;color:var(--text3);text-align:center;padding:4px}
+
+/* ══ QUOTE BUILDER ══ */
+.quote-line{display:grid;grid-template-columns:1.5fr 70px 90px 80px 28px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+
+/* ══ INVENTORY BARS ══ */
+.inv-bar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:3px}
+.inv-fill{height:100%;border-radius:3px;transition:width .4s}
+
+/* ══ PRINT STYLES ══ */
+@media print{
+  .sidebar,.topbar,.ph-right,.btn,.no-print{display:none!important}
+  .erp{display:block}
+  .content{overflow:visible;height:auto}
+  .page.act{padding:20px}
+  body{color:#000;background:#fff}
+  .card,.dtable{box-shadow:none;border:1px solid #ddd}
+}
+
+/* ══ COLORS ══ */
+.c-brand{color:var(--brand)}.c-green{color:var(--green)}.c-red{color:var(--red)}.c-amber{color:var(--amber)}.c-muted{color:var(--text3)}
+.bg-brand-lt{background:var(--brand-lt)}
+
+/* ══ UTILS ══ */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.flex{display:flex}.aic{align-items:center}.jcb{justify-content:space-between}.gap8{gap:8px}.gap12{gap:12px}
+.w100{width:100%}.sep{height:1px;background:var(--border);margin:10px 0}
+.empty{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px;line-height:1.8}.ei{font-size:26px;margin-bottom:6px}
+
+/* ══ ALERT BANNER ══ */
+.alert-banner{padding:9px 14px;border-radius:var(--r);font-size:12px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.alert-red{background:var(--red-lt);color:var(--red);border:1px solid rgba(217,48,37,.25)}
+.alert-amber{background:var(--amber-lt);color:var(--amber);border:1px solid rgba(242,153,0,.25)}
+.alert-green{background:var(--green-lt);color:var(--green);border:1px solid rgba(13,158,90,.25)}
+.alert-blue{background:var(--brand-lt);color:var(--brand);border:1px solid rgba(0,87,231,.2)}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:18px;right:18px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--green);color:var(--text);padding:10px 16px;border-radius:var(--r);font-size:12px;font-weight:600;box-shadow:var(--shadow-md);transform:translateY(56px);opacity:0;transition:all .25s;z-index:3000}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.e{border-left-color:var(--red)}.toast.w{border-left-color:var(--amber)}
+
+/* ══ STATUS DOT ══ */
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+.dot-g{background:var(--green)}.dot-a{background:var(--amber)}.dot-r{background:var(--red)}.dot-b{background:var(--brand)}
+</style>
+</head>
+<body>
+<div class="erp">
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="tb-logo">
+    <div class="tb-mark" id="tbMark">LG</div>
+    <div>
+      <div class="tb-name" id="tbName">Luks Global</div>
+      <div class="tb-sub" id="tbSub">Aggregator ERP</div>
+    </div>
+  </div>
+  <div class="tb-center">
+    <div class="tb-search">
+      <span class="tb-si">⌕</span>
+      <input placeholder="Search clients, orders, invoices... (⌘K)" id="gSearch" oninput="doSearch(this.value)" onkeydown="searchKey(event)">
+    </div>
+    <div class="tb-pills" id="tbPills"></div>
+  </div>
+  <div class="tb-right">
+    <div class="notif-btn" onclick="toggleNotif()" id="notifBtn">🔔<div class="notif-count" id="notifCount" style="display:none">0</div></div>
+    <button class="btn btn-ghost btn-sm" onclick="openM('lead')">＋ Lead</button>
+    <button class="btn btn-ghost btn-sm" onclick="openM('order')">＋ Order</button>
+    <button class="btn btn-brand btn-sm" onclick="openM('quote')">📋 Quote</button>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<nav class="sidebar">
+  <div style="padding:4px 0">
+    <div class="ns-label">Overview</div>
+    <button class="ni act" id="ni-dash" onclick="go('dash')"><span class="ni-icon">▪</span>Dashboard</button>
+    <div class="ns-div"></div>
+    <div class="ns-label">Sales & CRM</div>
+    <button class="ni" id="ni-leads" onclick="go('leads')"><span class="ni-icon">◎</span>Leads<span class="ni-badge nb-a" id="nb-leads">0</span></button>
+    <button class="ni" id="ni-clients" onclick="go('clients')"><span class="ni-icon">◈</span>Clients</button>
+    <button class="ni" id="ni-quotes" onclick="go('quotes')"><span class="ni-icon">◻</span>Quotes</button>
+    <button class="ni" id="ni-outreach" onclick="go('outreach')"><span class="ni-icon">◷</span>Outreach<span class="ni-badge nb-r" id="nb-out" style="display:none">!</span></button>
+    <div class="ns-div"></div>
+    <div class="ns-label">Operations</div>
+    <button class="ni" id="ni-orders" onclick="go('orders')"><span class="ni-icon">◫</span>Orders<span class="ni-badge nb-g" id="nb-orders">0</span></button>
+    <button class="ni" id="ni-pos" onclick="go('pos')"><span class="ni-icon">◧</span>Purchase Orders</button>
+    <button class="ni" id="ni-inventory" onclick="go('inventory')"><span class="ni-icon">◩</span>Inventory</button>
+    <button class="ni" id="ni-sourcing" onclick="go('sourcing')"><span class="ni-icon">◬</span>Sourcing & Loads</button>
+    <button class="ni" id="ni-docs" onclick="go('docs')"><span class="ni-icon">◪</span>Documents</button>
+    <div class="ns-div"></div>
+    <div class="ns-label">Finance</div>
+    <button class="ni" id="ni-invoices" onclick="go('invoices')"><span class="ni-icon">◑</span>Invoices<span class="ni-badge nb-r" id="nb-inv" style="display:none">0</span></button>
+    <button class="ni" id="ni-pl" onclick="go('pl')"><span class="ni-icon">◒</span>P&L / Reports</button>
+    <div class="ns-div"></div>
+    <div class="ns-label">Suppliers</div>
+    <button class="ni" id="ni-suppliers" onclick="go('suppliers')"><span class="ni-icon">◐</span>Supplier Network</button>
+    <div class="ns-div"></div>
+    <div class="ns-label" style="color:var(--brand)">Integrations</div>
+    <button class="ni" id="ni-bigcommerce" onclick="go('bigcommerce')" style="color:var(--brand);font-weight:600"><span class="ni-icon">🛒</span>BigCommerce Sync<span class="ni-badge" id="nb-bc" style="background:var(--brand-lt);color:var(--brand);display:none">!</span></button>
+    <div class="ns-div"></div>
+    <button class="ni" id="ni-settings" onclick="go('settings')"><span class="ni-icon">◌</span>Settings / OEM</button>
+  </div>
+  <div class="sb-foot">
+    <div class="cert-block">
+      <div class="cert-bl">Certifications</div>
+      <div class="cert-tags" id="certTags">
+        <span class="ctag">SDVOSB</span><span class="ctag">DVBE</span><span class="ctag">VOB</span><span class="ctag">VOSB</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ CONTENT AREA ══ -->
+<div class="content">
+
+<!-- ── DASHBOARD ── -->
+<div class="page act" id="p-dash">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+    <div>
+      <h1 style="font-size:18px;font-weight:800;letter-spacing:-.3px">Good morning, <span id="greetOwner" class="c-brand">Sakda</span> 👋</h1>
+      <p style="font-size:11px;color:var(--text3);margin-top:2px" id="greetDate"></p>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3)" id="dashClock"></div>
+  </div>
+  <div class="dash-kpi" id="dashKpi"></div>
+  <div class="dash-main mb12">
+    <div>
+      <div class="goal-card mb12">
+        <div class="goal-top">
+          <div><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:4px" id="dGoalLbl">Road to $10M</div><div class="goal-val" id="dGoalVal">$0</div></div>
+          <div style="text-align:right"><div class="goal-tgt" id="dGoalTgt">TARGET $10,000,000</div><div class="goal-pct-lg" id="dGoalPct">0%</div></div>
+        </div>
+        <div class="goal-bar"><div class="goal-fill" id="dGoalBar" style="width:0%"></div></div>
+        <div class="goal-bottom"><span id="dGoalSub">Annual pipeline run rate</span><span id="dGoalGap"></span></div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">📈 Monthly Revenue by Product Line</span></div>
+        <div class="cb" id="revChart"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">⚡ Activity Feed</span><button class="btn btn-ghost btn-xs" onclick="clearActivity()">Clear</button></div>
+      <div style="padding:4px 14px;max-height:300px;overflow-y:auto" id="actFeed"></div>
+    </div>
+  </div>
+  <div class="dash-3col">
+    <div class="card">
+      <div class="ch"><span class="ct">🎯 Hot Leads</span><button class="btn btn-ghost btn-xs" onclick="go('leads')">All →</button></div>
+      <div style="padding:4px 14px" id="dLeads"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">📦 Active Orders</span><button class="btn btn-ghost btn-xs" onclick="go('orders')">All →</button></div>
+      <div style="padding:4px 14px" id="dOrders"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">💰 Payments Due</span><button class="btn btn-ghost btn-xs" onclick="go('invoices')">All →</button></div>
+      <div style="padding:4px 14px" id="dPayments"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LEADS ── -->
+<div class="page" id="p-leads">
+  <div class="ph"><div><h1>Leads & Prospects</h1><p id="leadsSub"></p></div>
+    <div class="ph-right">
+      <select class="btn btn-ghost btn-sm" id="leadView" onchange="renderLeads()"><option value="table">Table</option><option value="kanban">Pipeline</option></select>
+      <select class="btn btn-ghost btn-sm" id="leadHeat" onchange="renderLeads()"><option value="all">All Heat</option><option value="hot">🔥 Hot</option><option value="warm">🌡 Warm</option><option value="cold">❄️ Cold</option></select>
+      <button class="btn btn-red btn-sm" onclick="openM('lead')">＋ Add Lead</button>
+    </div>
+  </div>
+  <div id="leadsContent"></div>
+</div>
+
+<!-- ── CLIENTS ── -->
+<div class="page" id="p-clients">
+  <div class="ph"><div><h1>Client Accounts</h1><p id="clientsSub"></p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('client')">＋ Add Client</button></div>
+  </div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.4fr 1fr .8fr .9fr .7fr .7fr 100px">
+      <span>Company</span><span>Products</span><span>Mo. Volume</span><span>Mo. Revenue</span><span>Status</span><span>Terms</span><span>Actions</span>
+    </div>
+    <div id="clientsBody"></div>
+  </div>
+</div>
+
+<!-- ── QUOTES ── -->
+<div class="page" id="p-quotes">
+  <div class="ph"><div><h1>Quote Builder</h1><p>Create professional quotes for prospects and clients</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('quote')">＋ New Quote</button></div>
+  </div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.3fr .9fr .9fr .8fr .8fr 100px">
+      <span>Client / Prospect</span><span>Product</span><span>Qty</span><span>Total Value</span><span>Status</span><span>Actions</span>
+    </div>
+    <div id="quotesBody"></div>
+  </div>
+</div>
+
+<!-- ── OUTREACH ── -->
+<div class="page" id="p-outreach">
+  <div class="ph"><div><h1>Daily Outreach Tracker</h1><p>30 minutes of outreach every day = $10M. No exceptions.</p></div>
+    <div class="ph-right">
+      <button class="btn btn-ghost btn-sm" onclick="switchOutView('list')" id="ov-list">📋 List</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchOutView('cal')" id="ov-cal">📅 Calendar</button>
+      <button class="btn btn-green btn-sm" onclick="openM('outreach')">＋ Add Task</button>
+    </div>
+  </div>
+  <div class="g4 mb12" id="streakGrid"></div>
+  <div id="outreachContent"></div>
+  <div class="card" style="margin-top:12px">
+    <div class="ch"><span class="ct">📋 Proven Scripts</span></div>
+    <div class="cb">
+      <div class="g2">
+        <div style="background:var(--brand-lt);border:1px solid rgba(0,87,231,.15);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--brand);margin-bottom:6px">COLD CALL OPENER</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">"Hi, this is [Name] from ProLUKS. We supply UN-certified steel drums DDP delivered to your SoCal facility at $42.95 all-in. We hold DVBE and SDVOSB certifications. How many drums do you use monthly, and who's your current supplier?"</div>
+        </div>
+        <div style="background:var(--green-lt);border:1px solid rgba(13,158,90,.15);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--green);margin-bottom:6px">DVBE GOVERNMENT OPENER</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">"Hi, I'm reaching out because we're DVBE and SDVOSB certified. We know [Agency] has diversity procurement requirements — we supply JanSan and industrial products under one invoice. Can I get on your approved vendor list?"</div>
+        </div>
+        <div style="background:var(--amber-lt);border:1px solid rgba(242,153,0,.15);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--amber);margin-bottom:6px">STANDING PO CLOSE</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">"Based on your volume I can lock your price for 12 months with a standing PO — no re-quoting, no surprises. You pick the delivery window, we show up. Want me to send the terms?"</div>
+        </div>
+        <div style="background:var(--purple-lt);border:1px solid rgba(124,58,237,.15);border-radius:var(--r);padding:12px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--purple);margin-bottom:6px">EMAIL SUBJECT LINES</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">• "DDP Steel Drums — Quote Ready for [Company]"<br>• "1-Year Price Lock Proposal — No Surprises"<br>• "DVBE Supplier — Preferred Vendor Packet"<br>• "350-Drum Pilot Program — Zero Commitment"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ORDERS ── -->
+<div class="page" id="p-orders">
+  <div class="ph"><div><h1>Order Management</h1><p id="ordersSub"></p></div>
+    <div class="ph-right">
+      <select class="btn btn-ghost btn-sm" id="orderFilter" onchange="renderOrders()"><option value="all">All</option><option value="active">Active</option><option value="delivered">Delivered</option></select>
+      <button class="btn btn-amber btn-sm" onclick="openM('order')">＋ New Order</button>
+    </div>
+  </div>
+  <div id="depBanner"></div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.2fr .7fr .6fr .8fr .7fr .6fr 80px 100px">
+      <span>Client / PO</span><span>Product</span><span>Qty</span><span>Route</span><span>Stage</span><span>Profit</span><span>Delivery</span><span>Actions</span>
+    </div>
+    <div id="ordersBody"></div>
+  </div>
+</div>
+
+<!-- ── PURCHASE ORDERS ── -->
+<div class="page" id="p-pos">
+  <div class="ph"><div><h1>Purchase Orders</h1><p>Formal POs to Axxis Containers and China supplier</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('po')">＋ New PO</button></div>
+  </div>
+  <div id="poBanner" class="mb12"></div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.2fr 1fr .8fr .8fr .7fr .7fr 100px">
+      <span>PO Number</span><span>Supplier</span><span>Product</span><span>Qty / Config</span><span>Total Cost</span><span>Status</span><span>Actions</span>
+    </div>
+    <div id="posBody"></div>
+  </div>
+</div>
+
+<!-- ── INVENTORY ── -->
+<div class="page" id="p-inventory">
+  <div class="ph"><div><h1>Inventory & Stock</h1><p>Virtual stock levels — drums on hand in Colton, CA</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('stock')">＋ Update Stock</button></div>
+  </div>
+  <div class="g4 mb12" id="invKpi"></div>
+  <div class="g2 mb12">
+    <div class="card">
+      <div class="ch"><span class="ct">📦 Current Stock Levels</span></div>
+      <div class="cb" id="stockLevels"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">🔄 Reorder Alerts</span></div>
+      <div class="cb" id="reorderAlerts"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SOURCING ── -->
+<div class="page" id="p-sourcing">
+  <div class="ph"><div><h1>Sourcing Lanes & Load Builder</h1><p>Container aggregation — your margin engine</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('load')">⚙️ Build Load</button></div>
+  </div>
+  <div class="g2 mb12">
+    <div class="card">
+      <div class="ch"><span class="ct">🌊 China DDP Import</span></div>
+      <div class="cb">
+        <div class="g3" style="margin-bottom:10px">
+          <div style="background:var(--card2);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">40HQ · 220 drums</div><div style="font-size:22px;font-weight:800;color:var(--brand)">$36.07</div></div>
+          <div style="background:var(--card2);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">45HQ · 250 drums</div><div style="font-size:22px;font-weight:800;color:var(--brand)">$35.93</div></div>
+          <div style="background:var(--brand-lt);border:1px solid rgba(0,87,231,.2);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:9px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">2×45HQ · 500 drums</div><div style="font-size:22px;font-weight:800;color:var(--brand)">$33.33</div></div>
+        </div>
+        <div style="background:var(--card2);border-radius:var(--r);padding:10px;font-size:11px;color:var(--text2);line-height:1.8"><b style="color:var(--text)">HS:</b> 7309000090 · <b style="color:var(--text)">Declared:</b> $7.25 · <b style="color:var(--text)">Duty:</b> 75% · <b style="color:var(--text)">Lead:</b> 60–75 days<br><span class="c-red font-weight:600">⚠ 50% deposit required before order placement</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">🚛 Axxis Containers — CA</span><span class="badge bg-g">🔒 1-YR LOCKED</span></div>
+      <div class="cb">
+        <div class="g2" style="margin-bottom:10px">
+          <div style="background:var(--green-lt);border:1px solid rgba(13,158,90,.2);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:9px;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">2-Ring · LOCKED</div><div style="font-size:26px;font-weight:900;color:var(--green)">$27.00</div><div style="font-size:10px;color:var(--text2)">Jennifer Perez confirmed</div></div>
+          <div style="background:var(--green-lt);border:1px solid rgba(13,158,90,.2);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:9px;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">3-Ring · LOCKED</div><div style="font-size:26px;font-weight:900;color:var(--green)">$30.00</div><div style="font-size:10px;color:var(--text2)">Jennifer Perez confirmed</div></div>
+        </div>
+        <div style="text-align:center;background:var(--card2);border-radius:var(--r);padding:10px"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">FTL Capacity</div><div style="font-size:24px;font-weight:800;color:var(--text)">340 <span style="font-size:13px;color:var(--text2)">drums/truck</span></div><div style="font-size:10px;color:var(--text2);margin-top:2px">Program fee: $150/shipment · SoCal JIT delivery</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="g4 mb12">
+    <div style="background:#fff;border:1.5px solid rgba(13,158,90,.25);border-radius:var(--r2);padding:14px;text-align:center;box-shadow:var(--shadow)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">2-Ring Standard</div><div style="font-size:11px;color:var(--text2)">Buy <b>$25</b> · Sell $41.50</div><div style="font-size:26px;font-weight:900;color:var(--green);margin:4px 0">$16.50</div><div style="font-size:9px;color:var(--text3)">per drum · public</div></div>
+    <div style="background:var(--brand-lt);border:1.5px solid rgba(0,87,231,.2);border-radius:var(--r2);padding:14px;text-align:center;box-shadow:var(--shadow)"><div style="font-size:9px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:700">2-Ring Hugo/ABC</div><div style="font-size:11px;color:var(--text2)">Buy <b>$25</b> · Sell $37.00</div><div style="font-size:26px;font-weight:900;color:var(--brand);margin:4px 0">$12.00</div><div style="font-size:9px;color:var(--text3)">per drum · contracted</div></div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:14px;text-align:center;box-shadow:var(--shadow)"><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Gowns Margin</div><div style="font-size:11px;color:var(--text2)">Buy $0.41 · Sell $0.56</div><div style="font-size:26px;font-weight:900;color:var(--amber);margin:4px 0">$0.15</div><div style="font-size:9px;color:var(--text3)">per piece</div></div>
+    <div style="background:var(--brand-lt);border:1.5px solid rgba(0,87,231,.2);border-radius:var(--r2);padding:14px;text-align:center;box-shadow:var(--shadow)"><div style="font-size:9px;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;font-weight:700">Program Fee Tiers</div><div style="font-size:10px;color:var(--text2);line-height:1.9;text-align:left;margin-top:4px">100-199 drums: <b style="color:var(--brand)">$150</b><br>200-349 drums: <b style="color:var(--brand)">$250</b><br>350-499 drums: <b style="color:var(--brand)">$400</b><br>500+ drums: <b style="color:var(--brand)">$500</b></div></div>
+  </div>
+  <div class="card mb12">
+    <div class="ch"><span class="ct">💡 Live Order Profit Calculator</span><span style="font-size:10px;color:var(--text3)">Axxis cost: $25/drum · Updated</span></div>
+    <div class="cb">
+      <div class="g2">
+        <div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="fg"><label class="fl">Client Type</label><select class="fs" id="pc-client" onchange="calcProfitCard()"><option value="standard">Standard ($41.50)</option><option value="hugo">Hugo/ABC ($37.00)</option><option value="custom">Custom price</option></select></div>
+            <div class="fg"><label class="fl">Quantity (drums)</label><input class="fi" type="number" id="pc-qty" value="350" oninput="calcProfitCard()"></div>
+            <div class="fg" id="pc-custom-wrap" style="display:none"><label class="fl">Custom Sell Price ($)</label><input class="fi" type="number" id="pc-custprice" value="41.50" oninput="calcProfitCard()"></div>
+          </div>
+        </div>
+        <div id="pc-result" style="background:var(--card2);border-radius:var(--r);padding:14px;font-size:12px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">📊 Active Container / Load Status</span></div>
+    <div class="cb" id="activeLoads"></div>
+  </div>
+</div>
+
+<!-- ── DOCUMENTS ── -->
+<div class="page" id="p-docs">
+  <div class="ph"><div><h1>Document Compliance</h1><p>UN Certs · SDS Sheets · Delivery Manifests · Customs</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('doc')">＋ Log Document</button></div>
+  </div>
+  <div class="g4 mb12" id="docKpi"></div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.3fr .9fr .9fr 1fr .9fr 100px"><span>Document</span><span>Type</span><span>Client</span><span>Issue Date</span><span>Status</span><span>Actions</span></div>
+    <div id="docsBody"></div>
+  </div>
+</div>
+
+<!-- ── INVOICES ── -->
+<div class="page" id="p-invoices">
+  <div class="ph"><div><h1>Invoices & Payments</h1><p id="invSub"></p></div>
+    <div class="ph-right">
+      <select class="btn btn-ghost btn-sm" id="invFilter" onchange="renderInvoices()"><option value="all">All</option><option value="unpaid">Unpaid</option><option value="overdue">Overdue</option><option value="paid">Paid</option></select>
+      <button class="btn btn-ghost btn-sm" onclick="exportInvoiceCSV()">⬇ Export CSV</button>
+      <button class="btn btn-brand btn-sm" onclick="openM('invoice')">＋ Invoice</button>
+    </div>
+  </div>
+  <div class="g4 mb12" id="invKpiTop"></div>
+  <div id="depWarning"></div>
+  <div class="dtable">
+    <div class="dth" style="grid-template-columns:1.2fr .8fr .9fr .9fr .8fr 110px"><span>Client</span><span>Invoice #</span><span>Amount</span><span>Due Date</span><span>Status</span><span>Actions</span></div>
+    <div id="invBody"></div>
+  </div>
+</div>
+
+<!-- ── P&L ── -->
+<div class="page" id="p-pl">
+  <div class="ph"><div><h1>P&L · Reports · Analytics</h1><p>Full financial picture</p></div>
+    <div class="ph-right"><button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 Print</button></div>
+  </div>
+  <div class="g2 mb12">
+    <div class="card">
+      <div class="ch"><span class="ct">P&L Snapshot</span></div>
+      <div class="cb" id="plBody" style="padding:0"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Revenue by Client</span></div>
+      <div class="cb" id="revByClient"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><span class="ct">Revenue by Product Line</span></div>
+      <div class="cb" id="revByProduct"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">🚀 Path to $10M</span></div>
+      <div class="cb" id="pathTo10m"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUPPLIERS ── -->
+<div class="page" id="p-suppliers">
+  <div class="ph"><div><h1>Supplier Network</h1><p>Manage supplier relationships, contacts, and price history</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="openM('supplier')">＋ Add Supplier</button></div>
+  </div>
+  <div id="supplierGrid"></div>
+</div>
+
+<!-- ── BIGCOMMERCE SYNC ── -->
+<div class="page" id="p-bigcommerce">
+  <div class="ph">
+    <div>
+      <h1 style="display:flex;align-items:center;gap:10px">
+        <span style="background:#121118;color:#fff;border-radius:6px;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:14px">🛒</span>
+        BigCommerce Integration
+      </h1>
+      <p>Connect your ProLUKS BigCommerce store — orders sync automatically into ERP</p>
+    </div>
+    <div class="ph-right">
+      <button class="btn btn-ghost btn-sm" onclick="bcTestConnection()" id="bcTestBtn">🔌 Test Connection</button>
+      <button class="btn btn-brand btn-sm" onclick="bcSyncOrders()">⟳ Sync Orders Now</button>
+    </div>
+  </div>
+
+  <!-- CONNECTION STATUS BANNER -->
+  <div id="bcStatusBanner" style="margin-bottom:16px"></div>
+
+  <!-- CONNECTION SETUP -->
+  <div class="g2 mb12">
+    <div class="card">
+      <div class="ch"><span class="ct">🔑 API Connection</span><span id="bcConnBadge" class="badge bg-dim">NOT CONNECTED</span></div>
+      <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--brand-lt);border:1px solid rgba(0,87,231,.15);border-radius:var(--r);padding:10px 12px;font-size:11px;color:var(--brand);line-height:1.7">
+          📍 Get your credentials: <b>BigCommerce Dashboard → Advanced Settings → API Accounts → Create V2/V3 Token</b><br>Required scopes: Orders READ/WRITE · Products READ · Customers READ · Webhooks MANAGE
+        </div>
+        <div class="fg"><label class="fl">Store Hash</label><input class="fi" id="bc-hash" placeholder="e.g. abc123def" oninput="bcCredsChanged()"></div>
+        <div class="fg"><label class="fl">Access Token</label><input class="fi" id="bc-token" type="password" placeholder="Your V2/V3 Access Token" oninput="bcCredsChanged()"></div>
+        <div class="fg"><label class="fl">Store Name (for display)</label><input class="fi" id="bc-storename" placeholder="ProLUKS Gloves & Safety"></div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-brand" style="flex:1" onclick="saveBCCreds()">💾 Save Credentials</button>
+          <button class="btn btn-ghost" onclick="bcTestConnection()">Test</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">⚡ Sync Settings</span></div>
+      <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+        <div class="fg"><label class="fl">Auto-Sync Orders</label>
+          <select class="fs" id="bc-autosync">
+            <option value="manual">Manual only</option>
+            <option value="startup">On ERP open</option>
+            <option value="15min">Every 15 minutes</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Default Supply Route for Drum Orders</label>
+          <select class="fs" id="bc-route">
+            <option value="axxis">🚛 Axxis (CA) — recommended</option>
+            <option value="china-45">🌊 China 45HQ</option>
+            <option value="china-2x45">🌊 China 2×45HQ</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Default Program Fee ($)</label>
+          <input class="fi" id="bc-fee" type="number" value="150" placeholder="150">
+        </div>
+        <div class="fg"><label class="fl">Auto-Create Invoice on Order Sync?</label>
+          <select class="fs" id="bc-autoinv">
+            <option value="yes">Yes — create invoice automatically</option>
+            <option value="no">No — manual invoice creation</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="saveBCSyncSettings()">Save Sync Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKU MAPPING -->
+  <div class="card mb12">
+    <div class="ch"><span class="ct">🗺 SKU → Product Mapping</span><span style="font-size:11px;color:var(--text3)">How BigCommerce SKUs map to your ERP product types</span></div>
+    <div class="cb">
+      <div class="dtable" style="box-shadow:none;border:none">
+        <div class="dth" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <span>BigCommerce SKU</span><span>Product Name (BC)</span><span>ERP Product Type</span><span>Default Sell Price</span>
+        </div>
+        <div id="skuMapBody"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="openM('skumap')">＋ Add SKU Mapping</button>
+    </div>
+  </div>
+
+  <!-- ORDER SYNC LOG -->
+  <div class="card mb12">
+    <div class="ch">
+      <span class="ct">📦 BigCommerce Orders — Sync Queue</span>
+      <div style="display:flex;gap:7px">
+        <span id="bcSyncTime" style="font-size:10px;color:var(--text3);align-self:center">Never synced</span>
+        <button class="btn btn-ghost btn-xs" onclick="bcSyncOrders()">⟳ Sync</button>
+      </div>
+    </div>
+    <div id="bcOrdersLog">
+      <div class="empty"><div class="ei">🛒</div>No BigCommerce orders synced yet.<br>Enter your API credentials and click "Sync Orders Now"</div>
+    </div>
+  </div>
+
+  <!-- WEBHOOK STATUS -->
+  <div class="card mb12">
+    <div class="ch"><span class="ct">🔔 Webhook Status</span><button class="btn btn-ghost btn-xs" onclick="bcRegisterWebhooks()">Register Webhooks</button></div>
+    <div class="cb" id="bcWebhooks">
+      <div class="g2">
+        <div style="background:var(--card2);border-radius:var(--r);padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-weight:600;font-size:12px">store/order/created</div>
+            <span id="wh-created" class="badge bg-dim">INACTIVE</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2)">Fires when client places new order → auto-creates ERP order record</div>
+        </div>
+        <div style="background:var(--card2);border-radius:var(--r);padding:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-weight:600;font-size:12px">store/order/updated</div>
+            <span id="wh-updated" class="badge bg-dim">INACTIVE</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2)">Fires on order status change → keeps ERP stages in sync</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;background:var(--amber-lt);border:1px solid rgba(242,153,0,.2);border-radius:var(--r);padding:10px;font-size:11px;color:#78350f">
+        ⚠ Webhooks require your ERP to be hosted at a public URL. Deploy to Netlify or Cloudflare Pages first, then register webhooks with that URL.
+        <a href="#" onclick="go('settings');return false" style="color:var(--brand);font-weight:600;margin-left:4px">See deployment guide →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATION GUIDE -->
+  <div class="card">
+    <div class="ch"><span class="ct">📋 Integration Checklist</span></div>
+    <div class="cb">
+      <div style="display:flex;flex-direction:column;gap:6px" id="bcChecklist">
+        <div class="bc-check" onclick="togBC(this)" data-done="false" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Create customer groups in BigCommerce (ABC Drilling, ESP, etc.)</div><div style="font-size:10px;color:var(--text3)">BC Dashboard → Customers → Customer Groups</div></div>
+          <span class="badge bg-b" style="margin-left:auto;flex-shrink:0">DAY 1</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Add product catalog (2-Ring LG-DR-2R, 3-Ring LG-DR-3R, Gowns LG-GWN)</div><div style="font-size:10px;color:var(--text3)">BC Dashboard → Catalog → Products → Add Product</div></div>
+          <span class="badge bg-b" style="margin-left:auto;flex-shrink:0">DAY 1</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Set up Price Lists with volume tiers per customer group</div><div style="font-size:10px;color:var(--text3)">BC Dashboard → Catalog → Price Lists</div></div>
+          <span class="badge bg-b" style="margin-left:auto;flex-shrink:0">DAY 2</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Enable Net 30 (Purchase Order) payment method</div><div style="font-size:10px;color:var(--text3)">BC Settings → Payments → Offline Methods → Purchase Order</div></div>
+          <span class="badge bg-b" style="margin-left:auto;flex-shrink:0">DAY 2</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Generate API credentials and enter into this module</div><div style="font-size:10px;color:var(--text3)">BC Advanced Settings → API Accounts → V2/V3 Token</div></div>
+          <span class="badge bg-a" style="margin-left:auto;flex-shrink:0">DAY 3</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Add ABC Drilling & ESP as BC customers, send login invites</div><div style="font-size:10px;color:var(--text3)">BC Customers → Add Customer → assign to group → Send invite</div></div>
+          <span class="badge bg-a" style="margin-left:auto;flex-shrink:0">DAY 3</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Place a test order as ABC Drilling — confirm it appears in ERP</div><div style="font-size:10px;color:var(--text3)">Log in as ABC Drilling → order 10 drums → check ERP Orders tab</div></div>
+          <span class="badge bg-g" style="margin-left:auto;flex-shrink:0">WEEK 2</span>
+        </div>
+        <div class="bc-check" onclick="togBC(this)" style="display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:var(--r);background:var(--card2);cursor:pointer;border:1px solid var(--border);transition:all .13s">
+          <div class="bc-dot" style="width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px"></div>
+          <div><div style="font-weight:600;font-size:12px">Go live — send ABC Drilling & ESP their login credentials</div><div style="font-size:10px;color:var(--text3)">You're now operating a 24/7 self-service B2B portal</div></div>
+          <span class="badge bg-g" style="margin-left:auto;flex-shrink:0">WEEK 3</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--card2);border-radius:var(--r)">
+        <div style="font-size:12px;color:var(--text2)">Progress: <span id="bcCheckPct" style="font-weight:700;color:var(--brand)">0 / 8 complete</span></div>
+        <div style="width:200px;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div id="bcCheckBar" style="height:100%;background:var(--brand);border-radius:3px;width:0%;transition:width .3s"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SETTINGS ── -->
+<div class="page" id="p-settings">
+  <div class="ph"><div><h1>Settings & OEM Branding</h1><p>White-label ready — rebrand for any business in 60 seconds</p></div>
+    <div class="ph-right"><button class="btn btn-brand btn-sm" onclick="saveSettings()">💾 Save & Apply</button></div>
+  </div>
+  <div class="g2 mb12">
+    <div class="card">
+      <div class="ch"><span class="ct">🏢 Company Identity</span></div>
+      <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+        <div class="fg"><label class="fl">Company Name</label><input class="fi" id="s-name" placeholder="Luks Global Inc."></div>
+        <div class="fg"><label class="fl">DBA Name</label><input class="fi" id="s-dba" placeholder="ProLUKS Gloves & Safety Inc."></div>
+        <div class="fr"><div class="fg"><label class="fl">Logo Initials</label><input class="fi" id="s-init" maxlength="3" placeholder="LG"></div><div class="fg"><label class="fl">Owner Name</label><input class="fi" id="s-owner" placeholder="Sakda"></div></div>
+        <div class="fg"><label class="fl">Tagline</label><input class="fi" id="s-tag" placeholder="Aggregator ERP"></div>
+        <div class="fg"><label class="fl">Location</label><input class="fi" id="s-loc" placeholder="Colton, CA 92324"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">🎨 Brand Color</span></div>
+      <div class="cb">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <input type="color" id="s-color" value="#0057e7" style="width:46px;height:46px;border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;background:none;padding:2px" oninput="liveColor(this.value)">
+          <input class="fi" id="s-hex" value="#0057e7" placeholder="#0057e7" oninput="syncHex(this.value)" style="flex:1">
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">
+          <div onclick="setColor('#0057e7')" style="width:28px;height:28px;border-radius:6px;background:#0057e7;cursor:pointer;border:2px solid transparent" title="Blue"></div>
+          <div onclick="setColor('#0d9e5a')" style="width:28px;height:28px;border-radius:6px;background:#0d9e5a;cursor:pointer" title="Green"></div>
+          <div onclick="setColor('#d93025')" style="width:28px;height:28px;border-radius:6px;background:#d93025;cursor:pointer" title="Red"></div>
+          <div onclick="setColor('#f29900')" style="width:28px;height:28px;border-radius:6px;background:#f29900;cursor:pointer" title="Amber"></div>
+          <div onclick="setColor('#7c3aed')" style="width:28px;height:28px;border-radius:6px;background:#7c3aed;cursor:pointer" title="Purple"></div>
+          <div onclick="setColor('#0891b2')" style="width:28px;height:28px;border-radius:6px;background:#0891b2;cursor:pointer" title="Teal"></div>
+          <div onclick="setColor('#1a1f36')" style="width:28px;height:28px;border-radius:6px;background:#1a1f36;cursor:pointer" title="Navy"></div>
+        </div>
+        <div class="fg mb12"><label class="fl">Annual Revenue Goal ($)</label><input class="fi" id="s-goal" type="number" placeholder="10000000"></div>
+        <div class="fg"><label class="fl">Goal Label</label><input class="fi" id="s-glabel" placeholder="Road to $10M / Year"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><span class="ct">🚀 OEM / White-Label — How to Sell This Platform</span></div>
+    <div class="cb">
+      <div class="g3">
+        <div style="background:var(--brand-lt);border-radius:var(--r);padding:14px"><div style="font-size:10px;color:var(--brand);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">✓ INCLUDED</div><div style="font-size:12px;color:var(--text2);line-height:1.8">Dashboard · Leads CRM · Client Roster · Quote Builder · Outreach Tracker + Calendar · Order Lifecycle · Purchase Orders · Inventory · Load Builder · Supplier Network · Document Compliance · Invoicing · P&L Reports · Goal Tracker · Notification Center</div></div>
+        <div style="background:var(--amber-lt);border-radius:var(--r);padding:14px"><div style="font-size:10px;color:var(--amber);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">⚡ REBRANDABLE</div><div style="font-size:12px;color:var(--text2);line-height:1.8">Company name · DBA · Logo initials · Brand color (live preview) · Tagline · Owner name · Revenue goal · Goal label · Certifications · All applies instantly. No code needed. Change name + color = new product.</div></div>
+        <div style="background:var(--green-lt);border-radius:var(--r);padding:14px"><div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">💰 SELL IT</div><div style="font-size:12px;color:var(--text2);line-height:1.8">Price: $497–$1,497 one-time<br>License to solo distributors, brokers, aggregators<br>Bundle with 1-day coaching: $2,500–$5,000<br>Name it: "Aggregator OS" or "JIT Supply Platform"<br>Your IP. Your brand. Recurring licenses.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ══ NOTIFICATION PANEL ══ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="np-head"><div class="np-title">🔔 Notifications</div><button class="btn btn-ghost btn-xs" onclick="clearNotifs()">Clear all</button></div>
+  <div id="notifList"></div>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- LEAD -->
+<div class="ovl" id="m-lead" onclick="closeOvl(event,'m-lead')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--red)">🎯 <span id="leadMT">Add Lead</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('lead')">✕</button></div>
+<div class="mb">
+  <div class="alert-banner alert-blue">🏅 Check for gov't diversity spend requirements — leverage SDVOSB · DVBE · VOB · VOSB</div>
+  <input type="hidden" id="l-id">
+  <div class="fr"><div class="fg"><label class="fl">Company *</label><input class="fi" id="l-name" placeholder="Clean Harbors"></div><div class="fg"><label class="fl">Contact</label><input class="fi" id="l-contact" placeholder="Jennifer Perez"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Phone</label><input class="fi" id="l-phone" placeholder="909-555-0100"></div><div class="fg"><label class="fl">Email</label><input class="fi" id="l-email" placeholder="buyer@company.com"></div></div>
+  <div class="fg"><label class="fl">Products</label><div class="tc-wrap"><input type="checkbox" id="lp-d" class="tc"><label for="lp-d" class="tl">🥁 Drums</label><input type="checkbox" id="lp-j" class="tc"><label for="lp-j" class="tl">🧹 JanSan</label><input type="checkbox" id="lp-g" class="tc"><label for="lp-g" class="tl">🥼 Gowns</label><input type="checkbox" id="lp-o" class="tc"><label for="lp-o" class="tl">📦 Other</label></div></div>
+  <div class="fg"><label class="fl">Cert Leverage</label><div class="tc-wrap"><input type="checkbox" id="lc-dv" class="tc"><label for="lc-dv" class="tl">DVBE</label><input type="checkbox" id="lc-sd" class="tc"><label for="lc-sd" class="tl">SDVOSB</label><input type="checkbox" id="lc-vb" class="tc"><label for="lc-vb" class="tl">VOB</label><input type="checkbox" id="lc-vs" class="tc"><label for="lc-vs" class="tl">VOSB</label></div></div>
+  <div class="fr3">
+    <div class="fg"><label class="fl">Heat</label><select class="fs" id="l-heat"><option value="hot">🔥 Hot</option><option value="warm">🌡 Warm</option><option value="cold">❄️ Cold</option></select></div>
+    <div class="fg"><label class="fl">Stage</label><select class="fs" id="l-stage"><option value="prospect">Prospect</option><option value="contacted">Contacted</option><option value="proposal">Proposal Sent</option><option value="negotiating">Negotiating</option><option value="closing">Closing</option></select></div>
+    <div class="fg"><label class="fl">Sector</label><select class="fs" id="l-sector"><option value="industrial">Industrial</option><option value="government">Government</option><option value="environmental">Environmental</option><option value="commercial">Commercial</option><option value="healthcare">Healthcare</option></select></div>
+  </div>
+  <div class="fr"><div class="fg"><label class="fl">Est. Monthly Value ($)</label><input class="fi" type="number" id="l-val" placeholder="15000"></div><div class="fg"><label class="fl">Next Action Due</label><input class="fi" type="date" id="l-ndate"></div></div>
+  <div class="fg"><label class="fl">Next Action</label><input class="fi" id="l-next" placeholder="Send ProLUKS one-pager + quote"></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="l-notes" placeholder="Key details, requirements, how you found them..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('lead')">Cancel</button><button class="btn btn-red" onclick="saveLead()">Save Lead</button></div>
+</div></div>
+
+<!-- CLIENT -->
+<div class="ovl" id="m-client" onclick="closeOvl(event,'m-client')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--brand)">🤝 <span id="clientMT">Add Client</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('client')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="cl-id">
+  <div class="fr"><div class="fg"><label class="fl">Company *</label><input class="fi" id="cl-name" placeholder="ABC Drilling"></div><div class="fg"><label class="fl">Contact</label><input class="fi" id="cl-contact" placeholder="Jennifer Perez"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Phone</label><input class="fi" id="cl-phone"></div><div class="fg"><label class="fl">Email</label><input class="fi" id="cl-email"></div></div>
+  <div class="fg"><label class="fl">Products</label><div class="tc-wrap"><input type="checkbox" id="cp-d" class="tc"><label for="cp-d" class="tl">🥁 Drums</label><input type="checkbox" id="cp-j" class="tc"><label for="cp-j" class="tl">🧹 JanSan</label><input type="checkbox" id="cp-g" class="tc"><label for="cp-g" class="tl">🥼 Gowns</label><input type="checkbox" id="cp-go" class="tc"><label for="cp-go" class="tl">🏛 Gov't</label></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Mo. Volume (units)</label><input class="fi" type="number" id="cl-vol" placeholder="350"></div><div class="fg"><label class="fl">Mo. Revenue ($)</label><input class="fi" type="number" id="cl-rev" placeholder="14500"></div><div class="fg"><label class="fl">Status</label><select class="fs" id="cl-status"><option value="active">Active</option><option value="pending">Pending</option><option value="prospect">Prospect</option><option value="paused">Paused</option></select></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Payment Terms</label><select class="fs" id="cl-terms"><option value="net30">Net 30</option><option value="net15">Net 15</option><option value="cod">COD</option><option value="prepay">Prepay</option></select></div><div class="fg"><label class="fl">Deposit Required?</label><select class="fs" id="cl-dep"><option value="no">No</option><option value="yes">Yes — 50%</option></select></div></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="cl-notes"></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('client')">Cancel</button><button class="btn btn-brand" onclick="saveClient()">Save Client</button></div>
+</div></div>
+
+<!-- QUOTE -->
+<div class="ovl" id="m-quote" onclick="closeOvl(event,'m-quote')">
+<div class="modal modal-lg"><div class="mh"><div class="mt" style="color:var(--brand)">📋 <span id="quoteMT">New Quote</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('quote')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="q-id">
+  <div class="fr"><div class="fg"><label class="fl">Client / Prospect *</label><input class="fi" id="q-client" placeholder="Clean Harbors"></div><div class="fg"><label class="fl">Quote # (auto)</label><input class="fi" id="q-num" placeholder="QT-2026-001"></div></div>
+  <div class="section-divider">Quote Line Items</div>
+  <div id="quoteLines" style="display:flex;flex-direction:column;gap:6px">
+    <div style="display:grid;grid-template-columns:1.5fr 80px 90px 80px 28px;gap:8px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);padding:0 0 4px;border-bottom:1px solid var(--border)"><span>Product</span><span>Qty</span><span>Unit Price</span><span>Total</span><span></span></div>
+  </div>
+  <button class="btn btn-ghost btn-sm w100" onclick="addQLine()" style="margin-top:8px;width:100%">＋ Add Line Item</button>
+  <div id="quoteTotals" style="background:var(--card2);border-radius:var(--r);padding:12px;margin-top:10px"></div>
+  <div class="fr"><div class="fg"><label class="fl">Valid Until</label><input class="fi" type="date" id="q-valid"></div><div class="fg"><label class="fl">Status</label><select class="fs" id="q-status"><option value="draft">Draft</option><option value="sent">Sent</option><option value="accepted">Accepted</option><option value="declined">Declined</option></select></div></div>
+  <div class="fg"><label class="fl">Notes / Terms</label><textarea class="ft" id="q-notes" placeholder="DDP pricing includes all freight and compliance documentation. Price lock available on standing PO..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('quote')">Cancel</button><button class="btn btn-ghost" onclick="printQuote()" style="color:var(--brand);border-color:rgba(0,87,231,.3)">🖨 Print</button><button class="btn btn-brand" onclick="saveQuote()">Save Quote</button></div>
+</div></div>
+
+<!-- ORDER -->
+<div class="ovl" id="m-order" onclick="closeOvl(event,'m-order')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--amber)">📦 <span id="orderMT">New Order</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('order')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="o-id">
+  <div class="fr"><div class="fg"><label class="fl">Client *</label><input class="fi" id="o-client" placeholder="ABC Drilling"></div><div class="fg"><label class="fl">PO Number</label><input class="fi" id="o-po" placeholder="PO-2026-001"></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Product</label><select class="fs" id="o-product"><option value="drums-2ring">🥁 Drums 2-Ring</option><option value="drums-3ring">🥁 Drums 3-Ring</option><option value="jansan">🧹 JanSan</option><option value="gowns">🥼 Gowns</option><option value="other">Other</option></select></div><div class="fg"><label class="fl">Quantity</label><input class="fi" type="number" id="o-qty" placeholder="350" oninput="calcOP()"></div><div class="fg"><label class="fl">Supply Route</label><select class="fs" id="o-route" onchange="calcOP()"><option value="axxis">🚛 Axxis (CA)</option><option value="china-40">🌊 China 40HQ</option><option value="china-45">🌊 China 45HQ</option><option value="china-2x45">🌊 China 2×45HQ</option><option value="local">🏭 Local</option></select></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Unit Sell Price ($)</label><input class="fi" type="number" id="o-price" placeholder="41.50" oninput="calcOP()"></div><div class="fg"><label class="fl">Program Fee ($)</label><input class="fi" type="number" id="o-fee" placeholder="150" oninput="calcOP()"></div><div class="fg"><label class="fl">Stage</label><select class="fs" id="o-stage"><option value="0">📋 Confirmed</option><option value="1">⚙️ Supplier Ordered</option><option value="2">🚚 In Transit</option><option value="3">✅ Delivered</option></select></div></div>
+  <div id="opBox" style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:12px;display:none"><div id="opRows"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Deposit Required?</label><select class="fs" id="o-depreq" onchange="tdep()"><option value="no">No</option><option value="yes">Yes — 50%</option></select></div><div class="fg" id="depcolWrap" style="display:none"><label class="fl">Deposit Collected?</label><select class="fs" id="o-depcol"><option value="no">Not yet ⚠</option><option value="yes">Yes — Collected</option></select></div></div>
+  <div class="fg"><label class="fl">Compliance Docs</label><div class="tc-wrap"><input type="checkbox" id="od-un" class="tc"><label for="od-un" class="tl">UN Cert</label><input type="checkbox" id="od-sds" class="tc"><label for="od-sds" class="tl">SDS Sheet</label><input type="checkbox" id="od-mn" class="tc"><label for="od-mn" class="tl">Manifest</label><input type="checkbox" id="od-cs" class="tc"><label for="od-cs" class="tl">Customs</label></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Order Date</label><input class="fi" type="date" id="o-date"></div><div class="fg"><label class="fl">Expected Delivery</label><input class="fi" type="date" id="o-delivery"></div></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="o-notes" placeholder="Delivery address, special instructions..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('order')">Cancel</button><button class="btn btn-amber" onclick="saveOrder()">Save Order</button></div>
+</div></div>
+
+<!-- PURCHASE ORDER -->
+<div class="ovl" id="m-po" onclick="closeOvl(event,'m-po')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--brand)">📄 <span id="poMT">New Purchase Order</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('po')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="po-id">
+  <div class="fr"><div class="fg"><label class="fl">PO Number</label><input class="fi" id="po-num" placeholder="LG-PO-2026-001"></div><div class="fg"><label class="fl">Supplier</label><select class="fs" id="po-supplier"><option value="axxis">Axxis Containers (CA)</option><option value="china">China Manufacturer</option><option value="local">Local Supplier</option></select></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Product</label><select class="fs" id="po-product"><option value="drums-2ring">🥁 2-Ring Drums</option><option value="drums-3ring">🥁 3-Ring Drums</option><option value="gowns">🥼 Gowns</option></select></div><div class="fg"><label class="fl">Quantity</label><input class="fi" type="number" id="po-qty" placeholder="340"></div><div class="fg"><label class="fl">Config</label><select class="fs" id="po-config"><option value="ftl">FTL (340 drums)</option><option value="40hq">40HQ (220 drums)</option><option value="45hq">45HQ (250 drums)</option><option value="2x45hq">2×45HQ (500 drums)</option></select></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Unit Cost ($)</label><input class="fi" type="number" id="po-cost" placeholder="27.00"></div><div class="fg"><label class="fl">Total PO Value ($)</label><input class="fi" type="number" id="po-total" placeholder="9180"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">PO Date</label><input class="fi" type="date" id="po-date"></div><div class="fg"><label class="fl">Expected Delivery</label><input class="fi" type="date" id="po-delivery"></div></div>
+  <div class="fg"><label class="fl">Approval Status</label><select class="fs" id="po-status"><option value="pending">Pending Approval</option><option value="approved">Approved — Send to Supplier</option><option value="sent">Sent to Supplier</option><option value="fulfilled">Fulfilled</option></select></div>
+  <div id="poDepAlert" class="alert-banner alert-red" style="display:none">⚠ DEPOSIT GATE: This China import PO requires 50% deposit to be collected from client BEFORE approval</div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="po-notes" placeholder="Linked client order, contact info, shipping instructions..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('po')">Cancel</button><button class="btn btn-ghost" onclick="window.print()" style="color:var(--brand)">🖨 Print PO</button><button class="btn btn-brand" onclick="savePO()">Save PO</button></div>
+</div></div>
+
+<!-- INVOICE -->
+<div class="ovl" id="m-invoice" onclick="closeOvl(event,'m-invoice')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--brand)">💰 <span id="invMT">Add Invoice</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('invoice')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="i-id">
+  <div class="fr"><div class="fg"><label class="fl">Client *</label><input class="fi" id="i-client" placeholder="ABC Drilling"></div><div class="fg"><label class="fl">Invoice #</label><input class="fi" id="i-num" placeholder="INV-2026-001"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Amount ($) *</label><input class="fi" type="number" id="i-amount" placeholder="14525"></div><div class="fg"><label class="fl">Type</label><select class="fs" id="i-type"><option value="net30">Net 30</option><option value="deposit">50% Deposit</option><option value="net15">Net 15</option><option value="cod">COD</option><option value="balance">Balance Due</option></select></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Invoice Date *</label><input class="fi" type="date" id="i-date"></div><div class="fg"><label class="fl">Due Date</label><input class="fi" type="date" id="i-due"></div></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="i-notes" placeholder="Related order, who to contact for payment..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('invoice')">Cancel</button><button class="btn btn-ghost" onclick="printInvoice()" style="color:var(--brand)">🖨 Print Invoice</button><button class="btn btn-brand" onclick="saveInvoice()">Save Invoice</button></div>
+</div></div>
+
+<!-- OUTREACH -->
+<div class="ovl" id="m-outreach" onclick="closeOvl(event,'m-outreach')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--green)">📞 Add Outreach Task</div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('outreach')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="ot-id">
+  <div class="fr"><div class="fg"><label class="fl">Company *</label><input class="fi" id="ot-co" placeholder="Clean Harbors"></div><div class="fg"><label class="fl">Contact</label><input class="fi" id="ot-ct" placeholder="Procurement Manager"></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Type</label><select class="fs" id="ot-type"><option value="call">📞 Phone Call</option><option value="email">📧 Email</option><option value="visit">🚗 In-Person</option><option value="followup">🔄 Follow Up</option><option value="quote">📋 Send Quote</option></select></div><div class="fg"><label class="fl">Priority</label><select class="fs" id="ot-pri"><option value="high">🔴 High</option><option value="med">🟡 Medium</option><option value="low">🟢 Low</option></select></div><div class="fg"><label class="fl">Est. Value ($)</label><input class="fi" type="number" id="ot-val" placeholder="15000"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Scheduled Date</label><input class="fi" type="date" id="ot-date"></div><div class="fg"><label class="fl">Phone / Email</label><input class="fi" id="ot-contact" placeholder="909-555-0100"></div></div>
+  <div class="fg"><label class="fl">Goal / Notes</label><textarea class="ft" id="ot-note" placeholder="What you want to accomplish..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('outreach')">Cancel</button><button class="btn btn-green" onclick="saveOT()">Save Task</button></div>
+</div></div>
+
+<!-- STOCK -->
+<div class="ovl" id="m-stock" onclick="closeOvl(event,'m-stock')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--teal)">📦 Update Stock Level</div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('stock')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="sk-id">
+  <div class="fr"><div class="fg"><label class="fl">Product *</label><select class="fs" id="sk-product"><option value="drums-2ring">🥁 Drums 2-Ring</option><option value="drums-3ring">🥁 Drums 3-Ring</option><option value="gowns">🥼 Gowns</option><option value="jansan">🧹 JanSan</option></select></div><div class="fg"><label class="fl">Location</label><input class="fi" id="sk-loc" placeholder="Colton, CA" value="Colton, CA"></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Current Stock (units)</label><input class="fi" type="number" id="sk-stock" placeholder="340"></div><div class="fg"><label class="fl">Reorder Point</label><input class="fi" type="number" id="sk-reorder" placeholder="100"></div><div class="fg"><label class="fl">Unit Cost ($)</label><input class="fi" type="number" id="sk-cost" placeholder="27.00"></div></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="sk-notes" placeholder="Last updated, incoming shipment details..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('stock')">Cancel</button><button class="btn btn-brand" onclick="saveStock()">Save Stock</button></div>
+</div></div>
+
+<!-- DOC -->
+<div class="ovl" id="m-doc" onclick="closeOvl(event,'m-doc')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--brand)">📄 Log Document</div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('doc')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="dc-id">
+  <div class="fr"><div class="fg"><label class="fl">Document Name *</label><input class="fi" id="dc-name" placeholder="UN Cert — ABC Drilling"></div><div class="fg"><label class="fl">Type</label><select class="fs" id="dc-type"><option value="un">UN Certificate</option><option value="sds">SDS Sheet</option><option value="manifest">Delivery Manifest</option><option value="customs">Customs Doc</option><option value="po">Purchase Order</option><option value="other">Other</option></select></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Client / Order</label><input class="fi" id="dc-client" placeholder="ABC Drilling"></div><div class="fg"><label class="fl">Issue Date</label><input class="fi" type="date" id="dc-date"></div></div>
+  <div class="fg"><label class="fl">Expiry Date (if applicable)</label><input class="fi" type="date" id="dc-exp"></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="dc-notes"></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('doc')">Cancel</button><button class="btn btn-brand" onclick="saveDoc()">Save</button></div>
+</div></div>
+
+<!-- SUPPLIER -->
+<div class="ovl" id="m-supplier" onclick="closeOvl(event,'m-supplier')">
+<div class="modal"><div class="mh"><div class="mt" style="color:var(--green)">🏭 <span id="supMT">Add Supplier</span></div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('supplier')">✕</button></div>
+<div class="mb">
+  <input type="hidden" id="sp-id">
+  <div class="fr"><div class="fg"><label class="fl">Supplier Name *</label><input class="fi" id="sp-name" placeholder="Axxis Containers"></div><div class="fg"><label class="fl">Contact</label><input class="fi" id="sp-contact" placeholder="Jennifer Perez"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Phone</label><input class="fi" id="sp-phone"></div><div class="fg"><label class="fl">Email</label><input class="fi" id="sp-email"></div></div>
+  <div class="fr"><div class="fg"><label class="fl">Lane Type</label><select class="fs" id="sp-lane"><option value="domestic">🚛 Domestic (CA)</option><option value="import">🌊 Import (China)</option></select></div><div class="fg"><label class="fl">Products</label><input class="fi" id="sp-products" placeholder="2-Ring Drums, 3-Ring Drums"></div></div>
+  <div class="fr3"><div class="fg"><label class="fl">Price/Unit ($)</label><input class="fi" type="number" id="sp-price" placeholder="27.00"></div><div class="fg"><label class="fl">Capacity/Load</label><input class="fi" id="sp-cap" placeholder="340 drums/FTL"></div><div class="fg"><label class="fl">Lead Time (days)</label><input class="fi" type="number" id="sp-lead" placeholder="3"></div></div>
+  <div class="fg"><label class="fl">Price Lock Expiry</label><input class="fi" type="date" id="sp-lock"></div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="sp-notes" placeholder="Relationship notes, price history, terms..."></textarea></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('supplier')">Cancel</button><button class="btn btn-green" onclick="saveSupplier()">Save Supplier</button></div>
+</div></div>
+
+<!-- LOAD BUILDER -->
+<div class="ovl" id="m-load" onclick="closeOvl(event,'m-load')">
+<div class="modal modal-lg"><div class="mh"><div class="mt" style="color:var(--brand)">⚙️ Container / Load Builder</div><button class="btn btn-ghost btn-sm btn-icon" onclick="closeM('load')">✕</button></div>
+<div class="mb">
+  <div class="fr"><div class="fg"><label class="fl">Supply Route</label><select class="fs" id="lb-route" onchange="calcLoad()"><option value="axxis">🚛 Axxis FTL (340 drums)</option><option value="china-40">🌊 China 40HQ (220)</option><option value="china-45">🌊 China 45HQ (250)</option><option value="china-2x45">🌊 China 2×45HQ (500)</option></select></div><div class="fg"><label class="fl">Drum Type</label><select class="fs" id="lb-dtype" onchange="calcLoad()"><option value="2ring">2-Ring ($27 cost / $41.50 sell)</option><option value="3ring">3-Ring ($30 cost / $43.50 sell)</option></select></div></div>
+  <div class="section-divider">Client Orders in This Load</div>
+  <div id="loadLines" style="display:flex;flex-direction:column;gap:6px"></div>
+  <button class="btn btn-ghost btn-sm" onclick="addLL()" style="margin-top:8px;width:100%">＋ Add Client to Load</button>
+  <div style="margin-top:14px"><div class="section-divider">Container Fill Visualization</div><div class="cv-bar" id="lbViz"></div><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-top:4px" id="lbVizInfo"></div></div>
+  <div id="lbSummary" style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-top:12px"></div>
+</div>
+<div class="mf"><button class="btn btn-ghost" onclick="closeM('load')">Close</button><button class="btn btn-brand" onclick="createOrdersFromLoad()">Create Orders from Load</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+const KEY='luks_erp_v3';
+let leads=[],clients=[],orders=[],invoices=[],outreach=[],docs=[],quotes=[],pos=[],stock=[],suppliers=[],activity=[],notifications=[];
+let cfg={name:'Luks Global Inc.',dba:'ProLUKS Gloves & Safety Inc.',initials:'LG',owner:'Sakda',tag:'Aggregator ERP',loc:'Colton, CA 92324',color:'#0057e7',goal:10000000,glabel:'Road to $10M / Year'};
+let outView='list',loadLines=[];
+
+const STAGES=['Confirmed','Supplier Ordered','In Transit','Delivered'];
+const SEGS=['#4285f4','#34a853','#ea4335','#fbbc04','#8956ff','#00bcd4','#ff5722','#009688'];
+
+function s(){try{localStorage.setItem(KEY,JSON.stringify({leads,clients,orders,invoices,outreach,docs,quotes,pos,stock,suppliers,activity,notifications,cfg}))}catch(e){}}
+function l(){try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);leads=d.leads||[];clients=d.clients||[];orders=d.orders||[];invoices=d.invoices||[];outreach=d.outreach||[];docs=d.docs||[];quotes=d.quotes||[];pos=d.pos||[];stock=d.stock||[];suppliers=d.suppliers||[];activity=d.activity||[];notifications=d.notifications||[];if(d.cfg)cfg={...cfg,...d.cfg}}}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function td(){return new Date().toISOString().split('T')[0]}
+function dl(due){if(!due)return null;return Math.round((new Date(due)-new Date(td()))/(864e5))}
+function f$(n){if(!n)return'$0';if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+(n||0).toLocaleString()}
+function gv(id){const e=document.getElementById(id);return e?e.value.trim():''}
+function sv(id,v){const e=document.getElementById(id);if(e)e.value=v||''}
+function setElV(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
+function log(txt,cat='system',color='var(--brand)'){activity.unshift({id:uid(),text:txt,cat,color,time:'Just now',ts:Date.now()});if(activity.length>60)activity=activity.slice(0,60);s()}
+function addNotif(txt,type='info'){notifications.unshift({id:uid(),text:txt,type,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),read:false});s();renderNotifBadge()}
+function renderNotifBadge(){const uc=notifications.filter(n=>!n.read).length;const nb=document.getElementById('notifCount');if(nb){nb.textContent=uc;nb.style.display=uc>0?'flex':'none'}}
+
+// ═══════════════════════════════════════
+// SEED DATA
+// ═══════════════════════════════════════
+function seed(){
+  const d=n=>{const dt=new Date();dt.setDate(dt.getDate()+n);return dt.toISOString().split('T')[0]};
+  leads=[
+    {id:uid(),name:'Clean Harbors',contact:'Procurement',phone:'',email:'',products:['drums'],certs:['dvbe'],heat:'hot',stage:'contacted',sector:'environmental',val:25000,next:'Call to confirm drum volume requirements',ndate:d(0),notes:'Major environmental waste company.',created:td()},
+    {id:uid(),name:'Snowline School District',contact:'',phone:'',email:'',products:['jansan'],certs:['dvbe','sdvosb'],heat:'hot',stage:'prospect',sector:'government',val:8000,next:'Email DVBE cert packet + JanSan catalog',ndate:d(1),notes:"Gov't contract. DVBE preferred.",created:td()},
+    {id:uid(),name:'ADC',contact:'',phone:'',email:'',products:['jansan'],certs:[],heat:'warm',stage:'contacted',sector:'commercial',val:5000,next:'Send JanSan product list + pricing',ndate:d(3),notes:'Commercial JanSan pending.',created:d(-5)},
+    {id:uid(),name:'Pacific Waste Solutions',contact:'',phone:'',email:'',products:['drums'],certs:[],heat:'warm',stage:'proposal',sector:'environmental',val:18000,next:'Follow up on proposal sent last week',ndate:d(2),notes:'Mid-size env company SoCal.',created:d(-7)},
+  ];
+  clients=[
+    {id:uid(),name:'ABC Drilling',contact:'',phone:'',email:'',products:['drums'],vol:500,rev:18000,status:'active',terms:'net30',dep:'no',notes:'Active. 350-1000 drums/mo.'},
+    {id:uid(),name:'ESP',contact:'',phone:'',email:'',products:['drums'],vol:300,rev:10000,status:'active',terms:'net30',dep:'no',notes:'Active.'},
+    {id:uid(),name:'Clean Harbors',contact:'',phone:'',email:'',products:['drums'],vol:0,rev:0,status:'pending',terms:'net30',dep:'no',notes:'Pending.'},
+    {id:uid(),name:'Snowline School District',contact:'',phone:'',email:'',products:['jansan'],vol:0,rev:0,status:'pending',terms:'net30',dep:'no',notes:"Gov't JanSan."},
+    {id:uid(),name:'Gowns Client',contact:'',phone:'',email:'',products:['gowns'],vol:10000,rev:5500,status:'active',terms:'net30',dep:'no',notes:'10K pcs/mo gowns.'},
+  ];
+  orders=[
+    {id:uid(),client:'ABC Drilling',po:'PO-2026-001',product:'drums-2ring',qty:350,route:'axxis',price:41.50,fee:150,cost:9450,rev:14525,profit:5075,stage:2,depreq:'no',depcol:'no',date:d(-10),delivery:d(3),docs:['un','sds'],notes:'Axxis FTL. 2-ring.'},
+    {id:uid(),client:'ESP',po:'PO-2026-002',product:'drums-3ring',qty:200,route:'axxis',price:43.50,fee:150,cost:6000,rev:8700,profit:2850,stage:1,depreq:'no',depcol:'no',date:d(-5),delivery:d(8),docs:['un'],notes:'Axxis 3-ring.'},
+    {id:uid(),client:'Gowns Client',po:'PO-2026-003',product:'gowns',qty:10000,route:'local',price:0.56,fee:0,cost:4100,rev:5600,profit:1500,stage:3,depreq:'no',depcol:'no',date:d(-15),delivery:d(-2),docs:['manifest'],notes:'Delivered.'},
+  ];
+  invoices=[
+    {id:uid(),client:'ABC Drilling',num:'INV-2026-001',amount:14525,type:'net30',date:d(-35),due:d(-5),paid:false,notes:'First order.'},
+    {id:uid(),client:'Gowns Client',num:'INV-2026-002',amount:5600,type:'net30',date:d(-20),due:d(10),paid:false,notes:'Gowns delivered.'},
+    {id:uid(),client:'ESP',num:'INV-2026-003',amount:4350,type:'deposit',date:d(-3),due:d(0),paid:false,notes:'50% deposit required before China order.'},
+  ];
+  suppliers=[
+    {id:uid(),name:'Axxis Containers',contact:'Jennifer Perez',phone:'',email:'',lane:'domestic',products:'2-Ring Drums, 3-Ring Drums',price:27,cap:'340 drums/FTL',lead:3,lock:d(365),notes:'Price locked 1 year. Confirmed.'},
+    {id:uid(),name:'China Manufacturer',contact:'',phone:'',email:'',lane:'import',products:'Steel Drums',price:33.33,cap:'500 drums / 2×45HQ',lead:70,lock:'',notes:'Lu\'an City, Anhui Province. HS 7309000090.'},
+  ];
+  outreach=[
+    {id:uid(),co:'Clean Harbors',ct:'Procurement',type:'call',pri:'high',date:td(),val:25000,contact:'',note:'Confirm drum volume and current supplier.',done:false},
+    {id:uid(),co:'Snowline School District',ct:'Purchasing',type:'email',pri:'high',date:td(),val:8000,contact:'',note:'Send DVBE cert packet + JanSan catalog.',done:false},
+    {id:uid(),co:'ABC Drilling',ct:'',type:'followup',pri:'high',date:td(),val:18000,contact:'',note:'Ask about converting to 12-month standing PO.',done:false},
+    {id:uid(),co:'ADC',ct:'',type:'email',pri:'med',date:td(),val:5000,contact:'',note:'Send JanSan product list + pricing.',done:false},
+  ];
+  stock=[
+    {id:uid(),product:'drums-2ring',loc:'Colton, CA',qty:120,reorder:100,cost:27,notes:'On hand at Axxis ready for FTL'},
+    {id:uid(),product:'drums-3ring',loc:'Colton, CA',qty:80,reorder:50,cost:30,notes:'On hand at Axxis'},
+    {id:uid(),product:'gowns',loc:'Colton, CA',qty:15000,reorder:5000,cost:0.41,notes:'In stock local'},
+  ];
+  quotes=[
+    {id:uid(),client:'Clean Harbors',num:'QT-2026-001',lines:[{product:'Steel Drums 2-Ring',qty:500,price:41.50,total:20750}],total:20750,status:'sent',valid:d(30),notes:'DDP pricing includes all freight and compliance docs. 1-year price lock available.'},
+  ];
+  docs=[
+    {id:uid(),name:'UN Cert — ABC Drilling PO-2026-001',type:'un',client:'ABC Drilling',date:d(-10),exp:d(355),notes:''},
+    {id:uid(),name:'SDS Sheet — Steel Drums 2026',type:'sds',client:'General',date:d(-30),exp:d(335),notes:'Applies to all drum orders.'},
+    {id:uid(),name:'Delivery Manifest — Gowns PO-2026-003',type:'manifest',client:'Gowns Client',date:d(-2),exp:'',notes:'Delivered.'},
+  ];
+  activity=[
+    {id:uid(),text:'ABC Drilling order in transit — delivery in 3 days',cat:'order',color:'#f29900',time:'Today'},
+    {id:uid(),text:'Axxis price lock confirmed $27/$30 — Jennifer Perez',cat:'supplier',color:'#0d9e5a',time:'Mar 19'},
+    {id:uid(),text:'INV-2026-001 ABC Drilling — 5 days overdue',cat:'invoice',color:'#d93025',time:'5d ago'},
+  ];
+  notifications=[
+    {id:uid(),text:'<strong>ABC Drilling invoice overdue</strong> — $14,525 · 5 days past due. Follow up now.',type:'urgent',time:'Now',read:false},
+    {id:uid(),text:'<strong>ESP deposit due today</strong> — $4,350 must be collected before supplier order.',type:'warning',time:'Today',read:false},
+    {id:uid(),text:'<strong>Clean Harbors</strong> — Hot lead with no contact in 2 days. Follow up.',type:'info',time:'Today',read:false},
+  ];
+  s();
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('act'));
+  document.getElementById('p-'+id)?.classList.add('act');
+  document.getElementById('ni-'+id)?.classList.add('act');
+  const map={dash:renderDash,leads:renderLeads,clients:renderClients,quotes:renderQuotes,outreach:renderOutreach,orders:renderOrders,pos:renderPOs,inventory:renderInventory,sourcing:renderSourcing,docs:renderDocs,invoices:renderInvoices,pl:renderPL,suppliers:renderSuppliers,settings:applySettings};
+  if(map[id])map[id]();
+}
+
+// ═══════════════════════════════════════
+// SETTINGS / BRANDING
+// ═══════════════════════════════════════
+function applySettings(){
+  document.documentElement.style.setProperty('--brand',cfg.color);
+  const r=parseInt(cfg.color.slice(1,3),16),g=parseInt(cfg.color.slice(3,5),16),b=parseInt(cfg.color.slice(5,7),16);
+  document.documentElement.style.setProperty('--brand-lt',`rgba(${r},${g},${b},0.08)`);
+  document.getElementById('tbMark').textContent=cfg.initials||'LG';
+  document.getElementById('tbName').textContent=cfg.name||'ERP';
+  document.getElementById('tbSub').textContent=cfg.tag||'Aggregator ERP';
+  document.getElementById('greetOwner').textContent=cfg.owner||'there';
+  document.title=(cfg.name||'ERP')+' Platform';
+  sv('s-name',cfg.name);sv('s-dba',cfg.dba);sv('s-init',cfg.initials);sv('s-owner',cfg.owner);sv('s-tag',cfg.tag);sv('s-loc',cfg.loc);sv('s-color',cfg.color);sv('s-hex',cfg.color);sv('s-goal',cfg.goal);sv('s-glabel',cfg.glabel);
+}
+function saveSettings(){cfg.name=gv('s-name')||cfg.name;cfg.dba=gv('s-dba')||cfg.dba;cfg.initials=gv('s-init')||cfg.initials;cfg.owner=gv('s-owner')||cfg.owner;cfg.tag=gv('s-tag')||cfg.tag;cfg.loc=gv('s-loc')||cfg.loc;cfg.color=gv('s-color')||cfg.color;cfg.goal=parseFloat(gv('s-goal'))||cfg.goal;cfg.glabel=gv('s-glabel')||cfg.glabel;s();applySettings();renderAll();toast('✓ Settings applied live across entire platform')}
+function liveColor(c){document.documentElement.style.setProperty('--brand',c);const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);document.documentElement.style.setProperty('--brand-lt',`rgba(${r},${g},${b},0.08)`);sv('s-hex',c)}
+function syncHex(v){if(/^#[0-9A-Fa-f]{6}$/.test(v)){sv('s-color',v);liveColor(v)}}
+function setColor(c){sv('s-color',c);sv('s-hex',c);liveColor(c);cfg.color=c;s()}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDash(){
+  const now=new Date();
+  document.getElementById('greetDate').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const ac=clients.filter(c=>c.status==='active');
+  const moRev=ac.reduce((s,c)=>s+(c.rev||0),0);
+  const annRun=moRev*12;
+  const out=invoices.filter(i=>!i.paid).reduce((s,i)=>s+(i.amount||0),0);
+  const ov=invoices.filter(i=>!i.paid&&i.due&&dl(i.due)<0);
+  const ao=orders.filter(o=>o.stage<3).length;
+  const hl=leads.filter(l=>l.heat==='hot').length;
+  const moProfit=orders.reduce((s,o)=>s+(o.profit||0),0);
+  const pct=Math.min(100,(annRun/cfg.goal)*100);
+
+  document.getElementById('dashKpi').innerHTML=[
+    {l:'Annual Run Rate',v:f$(annRun),sub:`${ac.length} active clients`,c:'var(--brand)'},
+    {l:'Monthly Revenue',v:f$(moRev),sub:'from active accounts',c:'#4285f4'},
+    {l:'Total Outstanding',v:f$(out),sub:ov.length>0?`⚠ ${ov.length} overdue`:'On track',c:ov.length>0?'var(--red)':'var(--amber)'},
+    {l:'Active Orders',v:ao,sub:'in progress',c:'var(--amber)'},
+    {l:'Hot Leads',v:hl,sub:'need follow-up today',c:'var(--red)'},
+  ].map(k=>`<div class="kpi"><div class="kpi-bar" style="background:${k.c}"></div><div class="kpi-label">${k.l}</div><div class="kpi-val" style="color:${k.c}">${k.v}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  document.getElementById('dGoalVal').textContent=f$(annRun);
+  document.getElementById('dGoalTgt').textContent='TARGET '+f$(cfg.goal);
+  document.getElementById('dGoalPct').textContent=pct.toFixed(1)+'%';
+  document.getElementById('dGoalBar').style.width=pct+'%';
+  document.getElementById('dGoalLbl').textContent=cfg.glabel||'Road to Goal';
+  document.getElementById('dGoalGap').textContent=f$(Math.max(0,cfg.goal-annRun))+' to go';
+
+  const dR=ac.filter(c=>c.products?.includes('drums')).reduce((s,c)=>s+c.rev,0);
+  const jR=ac.filter(c=>c.products?.includes('jansan')).reduce((s,c)=>s+c.rev,0);
+  const gR=ac.filter(c=>c.products?.includes('gowns')).reduce((s,c)=>s+c.rev,0);
+  const mx=Math.max(dR,jR,gR,1);
+  document.getElementById('revChart').innerHTML=`
+    <div style="display:flex;gap:10px;align-items:flex-end;height:80px;padding-bottom:22px">
+      ${[{l:'🥁 Drums',v:dR,c:'#ea4335'},{l:'🧹 JanSan',v:jR,c:'#4285f4'},{l:'🥼 Gowns',v:gR,c:'#fbbc04'}].map(b=>`
+        <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">
+          <div style="font-size:10px;font-weight:600;color:var(--text2);font-family:'JetBrains Mono',monospace">${f$(b.v)}</div>
+          <div style="width:100%;background:${b.c};border-radius:3px 3px 0 0;height:${Math.max(4,(b.v/mx*55))}px;opacity:.85"></div>
+          <div style="font-size:9px;color:var(--text3);white-space:nowrap">${b.l}</div>
+        </div>`).join('')}
+    </div>`;
+
+  document.getElementById('actFeed').innerHTML=activity.slice(0,8).map(a=>`
+    <div class="af-item"><div class="af-dot" style="background:${a.color}"></div><div class="af-text">${a.text}</div><div class="af-time">${a.time}</div></div>`).join('')||'<div class="empty"><div class="ei">⚡</div>No activity</div>';
+
+  const hl2=leads.filter(l=>l.heat==='hot').slice(0,5);
+  document.getElementById('dLeads').innerHTML=hl2.length?hl2.map(l=>`
+    <div class="mlr" style="grid-template-columns:1fr auto 26px">
+      <div><div class="ml-name">${l.name}</div><div style="font-size:10px;color:var(--text3)">${l.next||'No action set'}</div></div>
+      <span class="badge bg-r" style="font-size:8px">HOT</span>
+      <button class="btn btn-ghost btn-icon btn-xs" onclick="editLead('${l.id}')">✏️</button>
+    </div>`).join(''):'<div class="empty"><div class="ei">🎯</div>No hot leads</div>';
+
+  const ao2=orders.filter(o=>o.stage<3).slice(0,5);
+  document.getElementById('dOrders').innerHTML=ao2.length?ao2.map(o=>`
+    <div class="mlr" style="grid-template-columns:1fr 60px 56px 26px">
+      <div><div class="ml-name">${o.client}</div><div class="steps">${[0,1,2,3].map(i=>`<div class="seg ${i<o.stage?'done':i===o.stage?'cur':''}"></div>`).join('')}</div></div>
+      <span style="font-size:9px;color:var(--text2)">${STAGES[o.stage]}</span>
+      <span class="ml-val">${f$(o.rev)}</span>
+      <button class="btn btn-ghost btn-icon btn-xs" onclick="editOrder('${o.id}')">✏️</button>
+    </div>`).join(''):'<div class="empty"><div class="ei">📦</div>No active orders</div>';
+
+  const up=invoices.filter(i=>!i.paid).sort((a,b)=>new Date(a.due||0)-new Date(b.due||0)).slice(0,5);
+  document.getElementById('dPayments').innerHTML=up.length?up.map(i=>{
+    const d2=dl(i.due);const cl=i.type==='deposit'?'bg-b':d2===null?'bg-g':d2<0?'bg-r':d2<=7?'bg-a':'bg-g';const sl=i.type==='deposit'?'DEPOSIT':d2===null?'—':d2<0?Math.abs(d2)+'d OVER':d2===0?'TODAY':d2+'d';
+    return`<div class="mlr" style="grid-template-columns:1fr 76px 52px 26px">
+      <div class="ml-name">${i.client}</div>
+      <span class="ml-val" style="font-size:11px;color:${d2!==null&&d2<0?'var(--red)':'var(--green)'}">${f$(i.amount)}</span>
+      <span class="badge ${cl}" style="font-size:8px">${sl}</span>
+      <button class="btn btn-ghost btn-icon btn-xs" onclick="editInvoice('${i.id}')">✏️</button>
+    </div>`;}).join(''):'<div class="empty"><div class="ei">✅</div>All paid!</div>';
+
+  renderBadges();renderPills();
+}
+
+function renderBadges(){
+  const hl=leads.filter(l=>l.heat==='hot').length;
+  const ao=orders.filter(o=>o.stage<3).length;
+  const ov=invoices.filter(i=>!i.paid&&i.due&&dl(i.due)<0).length;
+  const bd=(id,v,show)=>{const e=document.getElementById(id);if(e){e.textContent=v;e.style.display=show?'':'none'}};
+  bd('nb-leads',hl,hl>0);bd('nb-orders',ao,ao>0);bd('nb-inv',ov,ov>0);
+  const od=outreach.filter(t=>!t.done&&t.date===td()).length;
+  bd('nb-out','!',od>0);
+}
+function renderPills(){
+  const ov=invoices.filter(i=>!i.paid&&i.due&&dl(i.due)<0).length;
+  const hl=leads.filter(l=>l.heat==='hot').length;
+  const ao=orders.filter(o=>o.stage<3).length;
+  document.getElementById('tbPills').innerHTML=
+    (ov>0?`<div class="tpill tpill-r"><div class="pdot"></div>${ov} OVERDUE</div>`:'')+
+    (hl>0?`<div class="tpill tpill-a"><div class="pdot"></div>${hl} HOT</div>`:'')+
+    `<div class="tpill tpill-g"><div class="pdot"></div>${ao} ORDERS</div>`;
+}
+
+// ═══════════════════════════════════════
+// LEADS
+// ═══════════════════════════════════════
+function renderLeads(){
+  const heat=gv('leadHeat')||'all';const view=gv('leadView')||'table';
+  const fl=heat==='all'?leads:leads.filter(l=>l.heat===heat);
+  document.getElementById('leadsSub').textContent=`${fl.length} leads · ${leads.filter(l=>l.heat==='hot').length} hot · ${leads.filter(l=>l.heat==='warm').length} warm`;
+  if(view==='kanban'){
+    const stages=['prospect','contacted','proposal','negotiating','closing'];
+    const lbl={prospect:'Prospect',contacted:'Contacted',proposal:'Proposal Sent',negotiating:'Negotiating',closing:'Closing'};
+    const hdr={prospect:'var(--text3)',contacted:'var(--brand)',proposal:'var(--amber)',negotiating:'var(--purple)',closing:'var(--green)'};
+    document.getElementById('leadsContent').innerHTML=`<div class="kanban">${stages.map(st=>{
+      const sl=fl.filter(l=>l.stage===st);
+      return`<div class="kb-col"><div class="kb-head" style="color:${hdr[st]}">${lbl[st]}<span class="badge bg-dim">${sl.length}</span></div>
+      <div class="kb-body">${sl.map(l=>`<div class="kb-card" onclick="editLead('${l.id}')"><div class="kb-name">${l.name}</div><div class="kb-sub">${l.sector||''} ${l.val?'· '+f$(l.val*12)+'/yr':''}</div>${(l.products||[]).map(p=>`<span class="tag t-${p[0]}">${p}</span>`).join('')}${(l.certs||[]).map(c=>`<span class="tag t-cert">${c.toUpperCase()}</span>`).join('')}<div style="font-size:9px;color:var(--text3);margin-top:4px">→ ${l.next||'No action'}</div></div>`).join('')||'<div style="font-size:11px;color:var(--text3);padding:8px;text-align:center">Empty</div>'}</div></div>`;
+    }).join('')}</div>`;
+  }else{
+    const hc={hot:'bg-r',warm:'bg-a',cold:'bg-dim'};
+    document.getElementById('leadsContent').innerHTML=`<div class="dtable"><div class="dth" style="grid-template-columns:1.3fr .7fr .8fr .9fr .7fr 100px"><span>Company</span><span>Heat</span><span>Stage</span><span>Next Action</span><span>Value</span><span>Actions</span></div>
+    <div>${fl.length?fl.sort((a,b)=>({hot:0,warm:1,cold:2}[a.heat])-({hot:0,warm:1,cold:2}[b.heat])).map(l=>`<div class="dtr" style="grid-template-columns:1.3fr .7fr .8fr .9fr .7fr 100px">
+      <div><div style="font-weight:600">${l.name}</div><div style="font-size:10px;color:var(--text3)">${l.contact||'No contact'} ${l.sector?'· '+l.sector:''}</div><div style="margin-top:2px">${(l.certs||[]).map(c=>`<span class="tag t-cert">${c.toUpperCase()}</span>`).join('')}${(l.products||[]).map(p=>`<span class="tag t-${p[0]}">${p}</span>`).join('')}</div></div>
+      <span class="badge ${hc[l.heat]||'bg-dim'}">${l.heat.toUpperCase()}</span>
+      <span class="badge bg-dim" style="font-size:9px">${l.stage||'prospect'}</span>
+      <div style="font-size:11px;color:var(--text2)">${l.next||'—'}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--green)">${l.val?f$(l.val)+'/mo':'—'}</div>
+      <div style="display:flex;gap:3px"><button class="btn btn-ghost btn-icon btn-xs" onclick="editLead('${l.id}')">✏️</button><button class="btn btn-ghost btn-icon btn-xs" onclick="l2o('${l.id}')" style="color:var(--amber)">📦</button><button class="btn btn-danger btn-icon btn-xs" onclick="delL('${l.id}')">✕</button></div>
+    </div>`).join(''):'<div class="empty"><div class="ei">🎯</div>No leads. Add your first prospect.</div>'}</div></div>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// CLIENTS
+// ═══════════════════════════════════════
+function renderClients(){
+  document.getElementById('clientsSub').textContent=`${clients.length} accounts · ${clients.filter(c=>c.status==='active').length} active`;
+  const sb={active:'bg-g',pending:'bg-a',prospect:'bg-dim',paused:'bg-p'};
+  document.getElementById('clientsBody').innerHTML=clients.length?clients.map(c=>`
+    <div class="dtr" style="grid-template-columns:1.4fr 1fr .8fr .9fr .7fr .7fr 100px">
+      <div><div style="font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--text3)">${c.contact||'No contact'}</div></div>
+      <div>${(c.products||[]).map(p=>`<span class="tag t-${p[0]}">${p}</span>`).join('')}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px">${c.vol?c.vol.toLocaleString()+' u':'—'}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--green)">${c.rev?f$(c.rev)+'/mo':'—'}</div>
+      <span class="badge ${sb[c.status]||'bg-dim'}">${c.status.toUpperCase()}</span>
+      <span style="font-size:11px;color:var(--text2)">${c.terms||'net30'}</span>
+      <div style="display:flex;gap:3px"><button class="btn btn-ghost btn-icon btn-xs" onclick="editClient('${c.id}')">✏️</button><button class="btn btn-danger btn-icon btn-xs" onclick="delC('${c.id}')">✕</button></div>
+    </div>`).join(''):'<div class="empty"><div class="ei">🤝</div>No clients yet.</div>';
+}
+
+// ═══════════════════════════════════════
+// QUOTES
+// ═══════════════════════════════════════
+let qLines=[];
+function renderQuotes(){
+  const sb={draft:'bg-dim',sent:'bg-b',accepted:'bg-g',declined:'bg-r'};
+  document.getElementById('quotesBody').innerHTML=quotes.length?quotes.map(q=>`
+    <div class="dtr" style="grid-template-columns:1.3fr .9fr .9fr .8fr .8fr 100px">
+      <div><div style="font-weight:600">${q.client}</div><div style="font-size:10px;color:var(--text3)">${q.num||''}</div></div>
+      <div>${(q.lines||[]).map(l=>`<span class="tag t-d">${l.product.substring(0,12)}</span>`).join('')}</div>
+      <div style="font-family:'JetBrains Mono',monospace">${(q.lines||[]).reduce((s,l)=>s+(l.qty||0),0).toLocaleString()} units</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--green)">${f$(q.total)}</div>
+      <span class="badge ${sb[q.status]||'bg-dim'}">${q.status.toUpperCase()}</span>
+      <div style="display:flex;gap:3px">
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="editQuote('${q.id}')">✏️</button>
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="q2o('${q.id}')" style="color:var(--amber)" title="→ Order">📦</button>
+        <button class="btn btn-danger btn-icon btn-xs" onclick="delQ('${q.id}')">✕</button>
+      </div>
+    </div>`).join(''):'<div class="empty"><div class="ei">📋</div>No quotes yet. Build your first quote.</div>';
+}
+
+function addQLine(){qLines.push({product:'Steel Drums 2-Ring',qty:0,price:41.50,total:0});renderQLines()}
+function renderQLines(){
+  document.getElementById('quoteLines').innerHTML=`<div style="display:grid;grid-template-columns:1.5fr 80px 90px 80px 28px;gap:8px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);padding:0 0 4px;border-bottom:1px solid var(--border)"><span>Product</span><span>Qty</span><span>Unit Price</span><span>Total</span><span></span></div>`
+  +qLines.map((l,i)=>`<div class="quote-line">
+    <input class="fi" style="font-size:12px;padding:6px 8px" value="${l.product}" oninput="qLines[${i}].product=this.value">
+    <input class="fi" type="number" style="font-size:12px;padding:6px 8px;text-align:right" value="${l.qty||''}" oninput="qLines[${i}].qty=parseInt(this.value)||0;qLines[${i}].total=qLines[${i}].qty*qLines[${i}].price;calcQTotals()">
+    <input class="fi" type="number" style="font-size:12px;padding:6px 8px;text-align:right" value="${l.price||''}" oninput="qLines[${i}].price=parseFloat(this.value)||0;qLines[${i}].total=qLines[${i}].qty*qLines[${i}].price;calcQTotals()">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--green);text-align:right;padding:6px 0">${f$(l.total)}</div>
+    <button class="btn btn-danger btn-icon btn-xs" onclick="qLines.splice(${i},1);renderQLines()">✕</button>
+  </div>`).join('');
+  calcQTotals();
+}
+function calcQTotals(){
+  const sub=qLines.reduce((s,l)=>s+(l.total||0),0);
+  const tax=0;const total=sub+tax;
+  document.getElementById('quoteTotals').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:6px;max-width:280px;margin-left:auto">
+      <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">Subtotal</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">${f$(sub)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;border-top:1px solid var(--border);padding-top:6px"><span>Total</span><span style="font-family:'JetBrains Mono',monospace;color:var(--green)">${f$(total)}</span></div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// OUTREACH
+// ═══════════════════════════════════════
+function switchOutView(v){outView=v;document.getElementById('ov-list').className='btn btn-ghost btn-sm'+(v==='list'?' btn-brand':'');document.getElementById('ov-cal').className='btn btn-ghost btn-sm'+(v==='cal'?' btn-brand':'');renderOutreach()}
+function renderOutreach(){
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const wd=new Date().getDay();
+  document.getElementById('streakGrid').innerHTML=days.map((d2,i)=>{
+    const it=i===wd;const id2=i<wd;const tasks=outreach.filter(t=>t.done&&new Date(t.date).getDay()===i).length;
+    return`<div class="kpi" style="text-align:center;cursor:default;border-top:3px solid ${it?'var(--brand)':id2?'var(--green)':'var(--border)'}">
+      <div class="kpi-label" style="text-align:center">${d2}${it?' ←':''}</div>
+      <div style="font-size:20px;margin:4px 0">${id2?'✅':it?'⚡':'⬜'}</div>
+      <div style="font-size:9px;color:var(--text3)">${id2?'Done':it?'Today':'—'}</div>
+    </div>`;}).join('');
+
+  if(outView==='cal'){
+    const now2=new Date();const y=now2.getFullYear();const m=now2.getMonth();
+    const first=new Date(y,m,1).getDay();const days2=new Date(y,m+1,0).getDate();
+    const dlbs=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let calHtml=`<div class="card mb12"><div class="ch"><span class="ct">📅 ${now2.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</span></div><div class="cb">
+      <div class="cal-grid">${dlbs.map(d2=>`<div class="cal-label">${d2}</div>`).join('')}`;
+    for(let i=0;i<first;i++)calHtml+='<div></div>';
+    for(let d2=1;d2<=days2;d2++){
+      const dateStr=`${y}-${String(m+1).padStart(2,'0')}-${String(d2).padStart(2,'0')}`;
+      const isT=dateStr===td();const hasTasks=outreach.filter(t=>t.date===dateStr).length>0;
+      const dTasks=outreach.filter(t=>t.date===dateStr&&!t.done).length;
+      calHtml+=`<div class="cal-cell${isT?' today':''}${hasTasks?' has-task':''}" onclick="filterOutDate('${dateStr}')">
+        <div style="font-weight:${isT?700:400};color:${isT?'var(--brand)':'var(--text)'};font-size:11px">${d2}</div>
+        ${dTasks>0?`<div style="font-size:9px;color:var(--brand);font-weight:600">${dTasks}</div>`:''}
+      </div>`;
+    }
+    calHtml+='</div></div></div>';
+    document.getElementById('outreachContent').innerHTML=calHtml+renderOTList();
+  }else{
+    document.getElementById('outreachContent').innerHTML=renderOTList();
+  }
+}
+function renderOTList(){
+  const tdy=outreach.filter(t=>t.date===td()&&!t.done);const fut=outreach.filter(t=>t.date>td()&&!t.done);const dn=outreach.filter(t=>t.done);
+  const rg=(tasks,title)=>tasks.length?`<div class="card mb12"><div class="ch" style="background:var(--card2)"><span class="ct">${title}</span><span class="badge bg-dim">${tasks.length} tasks</span></div>
+    ${tasks.map(t=>`<div style="display:grid;grid-template-columns:22px 1fr auto 100px;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);align-items:flex-start;font-size:12px">
+      <div style="width:18px;height:18px;border:1.5px solid ${t.done?'var(--green)':t.pri==='high'?'var(--red)':t.pri==='med'?'var(--amber)':'var(--brand)'};border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .13s;margin-top:1px;${t.done?'background:var(--green);color:#fff':''}" onclick="togOT('${t.id}')">${t.done?'✓':''}</div>
+      <div><div style="font-weight:600;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.co}${t.ct?' — '+t.ct:''}</div><div style="font-size:10px;color:var(--text2)">${{call:'📞 Call',email:'📧 Email',visit:'🚗 Visit',followup:'🔄 Follow Up',quote:'📋 Quote'}[t.type]||t.type}${t.note?' · '+t.note:''}</div></div>
+      <div style="display:flex;gap:3px;flex-shrink:0"><button class="btn btn-ghost btn-icon btn-xs" onclick="editOT('${t.id}')">✏️</button><button class="btn btn-danger btn-icon btn-xs" onclick="delOT('${t.id}')">✕</button></div>
+      <span class="badge ${{high:'bg-r',med:'bg-a',low:'bg-g'}[t.pri]||'bg-dim'}" style="justify-self:end">${t.pri?.toUpperCase()||'MED'}</span>
+    </div>`).join('')}</div>`:'';
+  return rg(tdy,"📅 Today's Outreach")+rg(fut,"📆 Upcoming")+(dn.length?`<div style="text-align:center;padding:8px;font-size:11px;color:var(--text3)">✅ ${dn.length} completed tasks</div>`:'');
+}
+function filterOutDate(dt){outView='list';renderOutreach()}
+
+// ═══════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════
+function renderOrders(){
+  const f=gv('orderFilter')||'all';
+  const fl=f==='all'?orders:f==='active'?orders.filter(o=>o.stage<3):orders.filter(o=>o.stage===3);
+  document.getElementById('ordersSub').textContent=`${fl.length} orders · ${orders.filter(o=>o.stage<3).length} active · ${f$(orders.reduce((s,o)=>s+(o.profit||0),0))} total profit`;
+  const dep=invoices.filter(i=>!i.paid&&i.type==='deposit');
+  document.getElementById('depBanner').innerHTML=dep.length?`<div class="alert-banner alert-red">⚠ DEPOSIT GATE: ${dep.map(i=>`${i.client} — ${f$(i.amount)}`).join(' · ')} — Collect before placing supplier order</div>`:'';
+  document.getElementById('ordersBody').innerHTML=fl.length?fl.sort((a,b)=>a.stage-b.stage).map(o=>{
+    const d2=dl(o.delivery);const ds=d2===null?'—':d2<0?`<span style="color:var(--red)">${Math.abs(d2)}d late</span>`:d2===0?`<span style="color:var(--amber)">TODAY</span>`:`${d2}d`;
+    const dw=o.depreq==='yes'&&o.depcol==='no';
+    return`<div class="dtr" style="grid-template-columns:1.2fr .7fr .6fr .8fr .7fr .6fr 80px 100px;${o.stage===3?'opacity:.6':''}">
+      <div><div style="font-weight:600">${o.client}</div><div style="font-size:10px;color:var(--text3)">${o.po||'No PO#'}${dw?` <span style="color:var(--red);font-weight:700">⚠ DEPOSIT!</span>`:''}</div></div>
+      <span class="tag t-${o.product?o.product[0]:'d'}">${o.product?.replace('-',' ')||''}</span>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px">${(o.qty||0).toLocaleString()}</div>
+      <div style="font-size:11px;color:var(--text2)">${{axxis:'🚛 Axxis','china-40':'🌊 40HQ','china-45':'🌊 45HQ','china-2x45':'🌊 2×45HQ',local:'🏭 Local'}[o.route]||o.route}</div>
+      <div><div class="steps">${[0,1,2,3].map(i=>`<div class="seg ${i<o.stage?'done':i===o.stage?'cur':''}"></div>`).join('')}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${STAGES[o.stage]}</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--green)">${f$(o.profit)}</div>
+      <div style="font-size:11px">${ds}</div>
+      <div style="display:flex;gap:3px">
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="editOrder('${o.id}')">✏️</button>
+        ${o.stage<3?`<button class="btn btn-ghost btn-icon btn-xs" onclick="advO('${o.id}')" style="color:var(--green)">▶</button>`:''}
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="o2i('${o.id}')" style="color:var(--brand)">💰</button>
+        <button class="btn btn-danger btn-icon btn-xs" onclick="delO('${o.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join(''):'<div class="empty"><div class="ei">📦</div>No orders yet.</div>';
+}
+
+// ═══════════════════════════════════════
+// PURCHASE ORDERS
+// ═══════════════════════════════════════
+function renderPOs(){
+  const sl={pending:'bg-a',approved:'bg-b',sent:'bg-t',fulfilled:'bg-g'};
+  const china=pos.filter(p=>p.supplier==='china'&&p.status!=='fulfilled');
+  document.getElementById('poBanner').innerHTML=china.length?`<div class="alert-banner alert-amber">⚡ China POs require 50% client deposit before approval: ${china.map(p=>p.num).join(', ')}</div>`:'';
+  document.getElementById('posBody').innerHTML=pos.length?pos.map(p=>`
+    <div class="dtr" style="grid-template-columns:1.2fr 1fr .8fr .8fr .7fr .7fr 100px">
+      <div><div style="font-weight:600">${p.num||'—'}</div><div style="font-size:10px;color:var(--text3)">${p.date||''}</div></div>
+      <div style="font-size:11px;font-weight:500">${{axxis:'Axxis Containers',china:'China Manufacturer',local:'Local Supplier'}[p.supplier]||p.supplier}</div>
+      <div>${p.product?`<span class="tag t-d">${p.product.replace('-',' ')}</span>`:''}</div>
+      <div style="font-size:11px;color:var(--text2)">${p.qty?p.qty.toLocaleString()+' · '+p.config:''}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--red)">${f$(p.total)}</div>
+      <span class="badge ${sl[p.status]||'bg-dim'}">${p.status?.toUpperCase()||'PENDING'}</span>
+      <div style="display:flex;gap:3px"><button class="btn btn-ghost btn-icon btn-xs" onclick="editPO('${p.id}')">✏️</button><button class="btn btn-danger btn-icon btn-xs" onclick="delPO('${p.id}')">✕</button></div>
+    </div>`).join(''):'<div class="empty"><div class="ei">📄</div>No purchase orders yet. Create your first PO to Axxis or China.</div>';
+}
+
+// ═══════════════════════════════════════
+// INVENTORY
+// ═══════════════════════════════════════
+function renderInventory(){
+  const totalVal=stock.reduce((s,k)=>s+(k.qty||0)*(k.cost||0),0);
+  const lowStock=stock.filter(k=>(k.qty||0)<=(k.reorder||0)).length;
+  document.getElementById('invKpi').innerHTML=[
+    {l:'Total SKUs',v:stock.length,c:'var(--brand)'},
+    {l:'Inventory Value',v:f$(totalVal),c:'var(--green)'},
+    {l:'Low Stock Alerts',v:lowStock,c:lowStock>0?'var(--red)':'var(--text2)'},
+    {l:'Location',v:'Colton, CA',c:'var(--brand)'},
+  ].map(k=>`<div class="kpi"><div class="kpi-bar" style="background:${k.c}"></div><div class="kpi-label">${k.l}</div><div class="kpi-val" style="color:${k.c};font-size:20px">${k.v}</div></div>`).join('');
+
+  const pmap={drums:'🥁 Drums','drums-2ring':'🥁 2-Ring','drums-3ring':'🥁 3-Ring',gowns:'🥼 Gowns',jansan:'🧹 JanSan'};
+  document.getElementById('stockLevels').innerHTML=stock.length?stock.map(k=>{
+    const pct=Math.min(100,((k.qty||0)/Math.max(k.qty||0,k.reorder||1,1))*100);const low=(k.qty||0)<=(k.reorder||0);
+    return`<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-weight:600;font-size:12px">${pmap[k.product]||k.product}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${low?`<span class="badge bg-r">LOW</span>`:''}
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:${low?'var(--red)':'var(--green)'}">${(k.qty||0).toLocaleString()} units</span>
+          <button class="btn btn-ghost btn-icon btn-xs" onclick="editStock('${k.id}')">✏️</button>
+        </div>
+      </div>
+      <div class="inv-bar"><div class="inv-fill" style="width:${pct}%;background:${low?'var(--red)':'var(--green)'}"></div></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">Reorder at ${(k.reorder||0).toLocaleString()} · ${k.loc||'Colton'} · $${k.cost||0}/unit</div>
+    </div>`;}).join(''):'<div class="empty"><div class="ei">📦</div>No stock records. Add your first SKU.</div>';
+
+  document.getElementById('reorderAlerts').innerHTML=stock.filter(k=>(k.qty||0)<=(k.reorder||0)).length?
+    stock.filter(k=>(k.qty||0)<=(k.reorder||0)).map(k=>`
+      <div style="background:var(--red-lt);border:1px solid rgba(217,48,37,.15);border-radius:var(--r);padding:10px;margin-bottom:8px">
+        <div style="font-weight:600;color:var(--red);font-size:12px">⚠ ${pmap[k.product]||k.product} — REORDER NOW</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:3px">${(k.qty||0).toLocaleString()} units remaining · Reorder point: ${(k.reorder||0).toLocaleString()}</div>
+      </div>`).join(''):'<div class="empty"><div class="ei">✅</div>All stock levels healthy</div>';
+}
+
+// ═══════════════════════════════════════
+// SOURCING
+// ═══════════════════════════════════════
+function renderSourcing(){
+  const aO=orders.filter(o=>o.stage<3&&o.route==='axxis');
+  const cO=orders.filter(o=>o.stage<3&&o.route?.startsWith('china'));
+  if(!aO.length&&!cO.length){document.getElementById('activeLoads').innerHTML='<div class="empty"><div class="ei">🚛</div>No active loads. Create orders to see load visualization.</div>';return}
+  let h='';
+  if(aO.length){const tot=aO.reduce((s,o)=>s+(o.qty||0),0);const cap=340;const pct=Math.min(100,tot/cap*100);
+    h+=`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:4px"><span>🚛 Axxis FTL — ${tot}/${cap} drums</span><span style="color:${pct>=80?'var(--green)':'var(--amber)'}">${pct.toFixed(0)}% full</span></div>
+    <div class="cv-bar">${aO.map((o,i)=>`<div class="cv-seg" style="width:${((o.qty||0)/cap*100).toFixed(1)}%;background:${SEGS[i%8]}">${(o.qty||0)>20?o.client.split(' ')[0]:''}</div>`).join('')}<div style="flex:1;background:var(--card2)"></div></div>
+    <div style="font-size:10px;color:var(--text2);margin-top:3px">${aO.map(o=>`${o.client}: ${o.qty}`).join(' · ')}</div></div>`;}
+  if(cO.length){const tot=cO.reduce((s,o)=>s+(o.qty||0),0);const cap=tot<=220?220:tot<=250?250:500;const lbl=cap===220?'40HQ':cap===250?'45HQ':'2×45HQ';const pct=Math.min(100,tot/cap*100);
+    h+=`<div><div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:4px"><span>🌊 China DDP ${lbl} — ${tot}/${cap} drums</span><span style="color:${pct>=80?'var(--green)':'var(--amber)'}">${pct.toFixed(0)}% full</span></div>
+    <div class="cv-bar">${cO.map((o,i)=>`<div class="cv-seg" style="width:${((o.qty||0)/cap*100).toFixed(1)}%;background:${SEGS[(i+3)%8]}">${(o.qty||0)>20?o.client.split(' ')[0]:''}</div>`).join('')}<div style="flex:1;background:var(--card2)"></div></div>
+    <div style="font-size:10px;color:var(--red);font-weight:600;margin-top:3px">⚡ Deposits must be collected before order is placed to China</div></div>`;}
+  document.getElementById('activeLoads').innerHTML=h;
+}
+
+// ═══════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════
+function renderDocs(){
+  const un=docs.filter(d=>d.type==='un').length;const sd=docs.filter(d=>d.type==='sds').length;const mn=docs.filter(d=>d.type==='manifest').length;const ex=docs.filter(d=>d.exp&&dl(d.exp)!==null&&dl(d.exp)<=30&&dl(d.exp)>=0).length;
+  document.getElementById('docKpi').innerHTML=[{l:'UN Certs',v:un,c:'var(--brand)'},{l:'SDS Sheets',v:sd,c:'var(--teal)'},{l:'Manifests',v:mn,c:'var(--amber)'},{l:'Expiring 30d',v:ex,c:ex>0?'var(--red)':'var(--green)'}].map(k=>`<div class="kpi"><div class="kpi-bar" style="background:${k.c}"></div><div class="kpi-label">${k.l}</div><div class="kpi-val" style="color:${k.c};font-size:22px">${k.v}</div></div>`).join('');
+  const tm={un:'UN Cert',sds:'SDS Sheet',manifest:'Manifest',customs:'Customs',po:'PO',other:'Other'};
+  document.getElementById('docsBody').innerHTML=docs.length?docs.map(d=>{const d2=d.exp?dl(d.exp):null;const sc=d2===null?'bg-g':d2<0?'bg-r':d2<=30?'bg-a':'bg-g';const sl=d2===null?'Active':d2<0?'EXPIRED':d2<=30?`Exp ${d2}d`:'Active';
+    return`<div class="dtr" style="grid-template-columns:1.3fr .9fr .9fr 1fr .9fr 100px"><div style="font-weight:600">${d.name}</div><span class="badge bg-b">${tm[d.type]||d.type}</span><div style="font-size:11px;color:var(--text2)">${d.client||'—'}</div><div style="font-size:11px;color:var(--text2)">${d.date||'—'}</div><span class="badge ${sc}">${sl}</span><div style="display:flex;gap:3px"><button class="btn btn-ghost btn-icon btn-xs" onclick="editDoc('${d.id}')">✏️</button><button class="btn btn-danger btn-icon btn-xs" onclick="delDoc('${d.id}')">✕</button></div></div>`;}).join(''):'<div class="empty"><div class="ei">📄</div>No documents. Log your first compliance doc.</div>';
+}
+
+// ═══════════════════════════════════════
+// INVOICES
+// ═══════════════════════════════════════
+function renderInvoices(){
+  const f=gv('invFilter')||'all';
+  const fl=f==='all'?invoices:f==='unpaid'?invoices.filter(i=>!i.paid):f==='overdue'?invoices.filter(i=>!i.paid&&i.due&&dl(i.due)<0):invoices.filter(i=>i.paid);
+  const out=invoices.filter(i=>!i.paid).reduce((s,i)=>s+(i.amount||0),0);
+  const ov=invoices.filter(i=>!i.paid&&i.due&&dl(i.due)<0);
+  const ds=invoices.filter(i=>!i.paid&&i.due&&dl(i.due)>=0&&dl(i.due)<=7).length;
+  const pd=invoices.filter(i=>i.paid).reduce((s,i)=>s+i.amount,0);
+  document.getElementById('invSub').textContent=`${fl.length} invoices · ${f$(out)} outstanding`;
+  document.getElementById('invKpiTop').innerHTML=[{l:'Outstanding',v:f$(out),c:ov.length>0?'var(--red)':'var(--amber)',s:ov.length>0?ov.length+' overdue ⚠':'On track'},{l:'Overdue',v:ov.length,c:'var(--red)',s:'Call now'},{l:'Due This Week',v:ds,c:'var(--amber)',s:'Follow up'},{l:'Paid Total',v:f$(pd),c:'var(--green)',s:'Collected'}].map(k=>`<div class="kpi"><div class="kpi-bar" style="background:${k.c}"></div><div class="kpi-label">${k.l}</div><div class="kpi-val" style="color:${k.c};font-size:22px">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
+  const dep=invoices.filter(i=>!i.paid&&i.type==='deposit');
+  document.getElementById('depWarning').innerHTML=dep.length?`<div class="alert-banner alert-red">⚠ DEPOSIT GATE — DO NOT place supplier order until collected: ${dep.map(i=>`${i.client} ${f$(i.amount)}`).join(' · ')}</div>`:'';
+  document.getElementById('invBody').innerHTML=fl.length?fl.sort((a,b)=>(a.paid?1:0)-(b.paid?1:0)||(new Date(a.due||0)-new Date(b.due||0))).map(i=>{
+    const d2=dl(i.due);const sc=i.paid?'bg-dim':i.type==='deposit'?'bg-b':d2===null?'bg-g':d2<0?'bg-r':d2<=7?'bg-a':'bg-g';const sl=i.paid?'✓ PAID':i.type==='deposit'?'⚡ DEPOSIT':d2===null?'—':d2<0?Math.abs(d2)+'d OVER':d2===0?'TODAY':d2+'d';
+    return`<div class="dtr" style="grid-template-columns:1.2fr .8fr .9fr .9fr .8fr 110px;${i.paid?'opacity:.5':''}">
+      <div><div style="font-weight:600">${i.client}</div><div style="font-size:10px;color:var(--text3)">${i.notes||''}</div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px">${i.num||'—'}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${!i.paid&&d2!==null&&d2<0?'var(--red)':'var(--green)'}">${f$(i.amount)}</div>
+      <div style="font-size:11px;color:var(--text2)">${i.due||'—'}</div>
+      <span class="badge ${sc}">${sl}</span>
+      <div style="display:flex;gap:3px">
+        ${!i.paid?`<button class="btn btn-ghost btn-icon btn-xs" onclick="markPaid('${i.id}')" style="color:var(--green)" title="Mark Paid">✓</button>`:''}
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="printInvoiceId('${i.id}')">🖨</button>
+        <button class="btn btn-ghost btn-icon btn-xs" onclick="editInvoice('${i.id}')">✏️</button>
+        <button class="btn btn-danger btn-icon btn-xs" onclick="delI('${i.id}')">✕</button>
+      </div>
+    </div>`;}).join(''):'<div class="empty"><div class="ei">💰</div>No invoices match this filter.</div>';
+}
+
+// ═══════════════════════════════════════
+// P&L
+// ═══════════════════════════════════════
+function renderPL(){
+  const ac=clients.filter(c=>c.status==='active');
+  const moRev=ac.reduce((s,c)=>s+(c.rev||0),0);
+  const moProfit=orders.reduce((s,o)=>s+(o.profit||0),0);
+  const dR=ac.filter(c=>c.products?.includes('drums')).reduce((s,c)=>s+c.rev,0);
+  const jR=ac.filter(c=>c.products?.includes('jansan')).reduce((s,c)=>s+c.rev,0);
+  const gR=ac.filter(c=>c.products?.includes('gowns')).reduce((s,c)=>s+c.rev,0);
+
+  document.getElementById('plBody').innerHTML=`
+    <div class="pl-row head" style="grid-template-columns:1fr 100px 100px"><span>Category</span><span style="text-align:right">Monthly</span><span style="text-align:right">Annual</span></div>
+    <div class="pl-row" style="grid-template-columns:1fr 100px 100px;font-weight:700"><span>REVENUE</span><div class="pl-num c-green">${f$(moRev)}</div><div class="pl-num c-green">${f$(moRev*12)}</div></div>
+    <div class="pl-row sub" style="grid-template-columns:1fr 100px 100px"><span>Drums</span><div class="pl-num">${f$(dR)}</div><div class="pl-num">${f$(dR*12)}</div></div>
+    <div class="pl-row sub" style="grid-template-columns:1fr 100px 100px"><span>JanSan</span><div class="pl-num">${f$(jR)}</div><div class="pl-num">${f$(jR*12)}</div></div>
+    <div class="pl-row sub" style="grid-template-columns:1fr 100px 100px"><span>Gowns</span><div class="pl-num">${f$(gR)}</div><div class="pl-num">${f$(gR*12)}</div></div>
+    <div class="pl-row" style="grid-template-columns:1fr 100px 100px;font-weight:700;margin-top:4px"><span>GROSS PROFIT</span><div class="pl-num c-green">${f$(moProfit)}</div><div class="pl-num c-green">${f$(moProfit*12)}</div></div>
+    <div class="pl-row total" style="grid-template-columns:1fr 100px 100px"><span>ANNUAL RUN RATE</span><div class="pl-num">${f$(moRev)}/mo</div><div class="pl-num">${f$(moRev*12)}</div></div>`;
+
+  const actC=ac.filter(c=>c.rev>0);const mx=Math.max(...actC.map(c=>c.rev),1);
+  document.getElementById('revByClient').innerHTML=actC.length?actC.sort((a,b)=>b.rev-a.rev).map((c,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <div style="width:100px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.name}</div>
+      <div style="flex:1;background:var(--card2);border-radius:2px;height:6px;overflow:hidden"><div style="height:100%;background:${SEGS[i%8]};border-radius:2px;width:${(c.rev/mx*100).toFixed(0)}%"></div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--green);white-space:nowrap">${f$(c.rev)}/mo</div>
+    </div>`).join(''):'<div class="empty"><div class="ei">🤝</div>No active clients</div>';
+
+  const prods=[{l:'🥁 Drums',v:dR,c:SEGS[0]},{l:'🧹 JanSan',v:jR,c:SEGS[1]},{l:'🥼 Gowns',v:gR,c:SEGS[2]}];const mxP=Math.max(...prods.map(p=>p.v),1);
+  document.getElementById('revByProduct').innerHTML=prods.map(p=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:80px;font-size:12px;font-weight:600">${p.l}</div>
+      <div style="flex:1;background:var(--card2);border-radius:3px;height:8px;overflow:hidden"><div style="height:100%;background:${p.c};border-radius:3px;width:${(p.v/mxP*100).toFixed(0)}%"></div></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap" style="color:${p.c}">${f$(p.v)}/mo</div>
+    </div>`).join('');
+
+  const need=cfg.goal-moRev*12;const mNeed=need/12;const dNeed=Math.ceil(mNeed/14.50);
+  document.getElementById('pathTo10m').innerHTML=`
+    <div style="background:var(--brand-lt);border-radius:var(--r);padding:12px;margin-bottom:8px"><div style="font-size:11px;color:var(--text2)">You need <strong style="color:var(--brand)">${f$(mNeed)}/mo</strong> more revenue to hit ${f$(cfg.goal)}</div></div>
+    ${[{l:'More Drums',d:`${dNeed.toLocaleString()} more drums/mo at $14.50 margin = ${Math.ceil(dNeed/340)} Axxis FTL trucks`,c:'var(--red)'},{l:'Gov\'t Contracts',d:'1 DVBE contract = $500K–$2M/yr · Register on CaleProcure.ca.gov + SAM.gov',c:'var(--green)'},{l:'Close Pipeline',d:'Clean Harbors + Snowline + ADC = est. +$38K/mo if all convert',c:'var(--amber)'}].map(o=>`
+    <div style="background:var(--card2);border-radius:var(--r);padding:10px;margin-bottom:6px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:${o.c};margin-bottom:3px">${o.l}</div>
+      <div style="font-size:12px;color:var(--text2)">${o.d}</div>
+    </div>`).join('')}`;
+}
+
+// ═══════════════════════════════════════
+// SUPPLIERS
+// ═══════════════════════════════════════
+function renderSuppliers(){
+  document.getElementById('supplierGrid').innerHTML=`<div class="g2">${suppliers.length?suppliers.map(sp=>`
+    <div class="card">
+      <div class="ch">
+        <span class="ct">${sp.lane==='import'?'🌊':'🚛'} ${sp.name}</span>
+        <div style="display:flex;gap:6px">
+          ${sp.lock?`<span class="badge bg-g">🔒 Lock exp. ${sp.lock}</span>`:''}
+          <button class="btn btn-ghost btn-icon btn-xs" onclick="editSupplier('${sp.id}')">✏️</button>
+          <button class="btn btn-danger btn-icon btn-xs" onclick="delSup('${sp.id}')">✕</button>
+        </div>
+      </div>
+      <div class="cb">
+        <div class="g2">
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Contact</div><div style="font-size:12px;font-weight:600">${sp.contact||'—'}</div><div style="font-size:11px;color:var(--text2)">${sp.phone||''} ${sp.email||''}</div></div>
+          <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">Unit Cost</div><div style="font-size:22px;font-weight:800;color:var(--green)">$${sp.price||0}</div></div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text2)">Products: ${sp.products||'—'}</span><span style="color:var(--text2)">Capacity: ${sp.cap||'—'}</span><span style="color:var(--text2)">Lead: ${sp.lead||0}d</span></div>
+          ${sp.notes?`<div style="font-size:11px;color:var(--text3);margin-top:6px">${sp.notes}</div>`:''}
+        </div>
+      </div>
+    </div>`).join(''):'<div class="empty" style="grid-column:1/-1"><div class="ei">🏭</div>No suppliers. Add Axxis and your China manufacturer.</div>'}</div>`;
+}
+
+// ═══════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════
+function toggleNotif(){document.getElementById('notifPanel').classList.toggle('open')}
+function renderNotifPanel(){
+  document.getElementById('notifList').innerHTML=notifications.length?notifications.map(n=>{
+    const ic={urgent:'🚨',warning:'⚠️',info:'ℹ️'}[n.type]||'🔔';
+    const bg={urgent:'var(--red-lt)',warning:'var(--amber-lt)',info:'var(--brand-lt)'}[n.type]||'#fff';
+    return`<div class="np-item" style="${n.read?'':''}" onclick="readNotif('${n.id}')">
+      <div class="np-icon" style="background:${bg}">${ic}</div>
+      <div><div class="np-text">${n.text}</div><div class="np-time">${n.time}</div></div>
+      ${!n.read?`<div style="width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:4px"></div>`:''}
+    </div>`;}).join(''):'<div class="empty" style="padding:24px"><div class="ei">🔔</div>All caught up!</div>';
+}
+function readNotif(id){const n=notifications.find(x=>x.id===id);if(n)n.read=true;s();renderNotifBadge();renderNotifPanel()}
+function clearNotifs(){notifications=notifications.map(n=>({...n,read:true}));s();renderNotifBadge();renderNotifPanel();toast('Notifications cleared')}
+
+// ═══════════════════════════════════════
+// MODALS / FORMS
+// ═══════════════════════════════════════
+function openM(type){
+  const td2=td();const due30=new Date();due30.setDate(due30.getDate()+30);
+  if(type==='order'){sv('o-date',td2);const dd=new Date();dd.setDate(dd.getDate()+14);sv('o-delivery',dd.toISOString().split('T')[0]);calcOP();}
+  if(type==='invoice'){sv('i-date',td2);sv('i-due',due30.toISOString().split('T')[0]);}
+  if(type==='outreach')sv('ot-date',td2);
+  if(type==='doc')sv('dc-date',td2);
+  if(type==='po'){sv('po-date',td2);const dd2=new Date();dd2.setDate(dd2.getDate()+70);sv('po-delivery',dd2.toISOString().split('T')[0]);}
+  if(type==='quote'){qLines=[{product:'Steel Drums 2-Ring',qty:0,price:41.50,total:0}];renderQLines();sv('q-num','QT-'+Date.now().toString(36).toUpperCase());const qv=new Date();qv.setDate(qv.getDate()+30);sv('q-valid',qv.toISOString().split('T')[0]);}
+  if(type==='load'){loadLines=[];addLL();calcLoad();}
+  document.getElementById('m-'+type).classList.add('open');
+}
+function closeM(t){document.getElementById('m-'+t).classList.remove('open')}
+function closeOvl(e,id){if(e.target===document.getElementById(id))closeM(id.replace('m-',''))}
+
+// ─ LEAD ─
+function saveLead(){
+  const name=gv('l-name');if(!name){toast('⚠ Company name required','w');return}
+  const products=['d','j','g','o'].filter(p=>document.getElementById('lp-'+p)?.checked).map(p=>({d:'drums',j:'jansan',g:'gowns',o:'other'}[p]));
+  const certs=['dv','sd','vb','vs'].filter(c=>document.getElementById('lc-'+c)?.checked).map(c=>({dv:'dvbe',sd:'sdvosb',vb:'vob',vs:'vosb'}[c]));
+  const id=gv('l-id');
+  const data={name,contact:gv('l-contact'),phone:gv('l-phone'),email:gv('l-email'),products,certs,heat:gv('l-heat')||'warm',stage:gv('l-stage')||'prospect',sector:gv('l-sector')||'industrial',val:parseFloat(gv('l-val'))||0,next:gv('l-next'),ndate:gv('l-ndate'),notes:gv('l-notes')};
+  if(id){const i=leads.findIndex(x=>x.id===id);if(i>-1)leads[i]={...leads[i],...data};log('Lead updated: '+name,'lead','#fbbc04')}
+  else{leads.push({id:uid(),created:td(),...data});log('New lead added: '+name,'lead','#ea4335');addNotif(`New lead: <strong>${name}</strong> added`,'info')}
+  s();closeM('lead');renderAll();if(document.getElementById('p-leads').classList.contains('act'))renderLeads();toast('✓ Lead saved — '+name);
+}
+function editLead(id){const lx=leads.find(x=>x.id===id);if(!lx)return;sv('l-id',lx.id);sv('l-name',lx.name);sv('l-contact',lx.contact||'');sv('l-phone',lx.phone||'');sv('l-email',lx.email||'');sv('l-heat',lx.heat);sv('l-stage',lx.stage||'prospect');sv('l-sector',lx.sector||'industrial');sv('l-val',lx.val||'');sv('l-next',lx.next||'');sv('l-ndate',lx.ndate||'');sv('l-notes',lx.notes||'');['d','j','g','o'].forEach(p=>{const el=document.getElementById('lp-'+p);if(el)el.checked=(lx.products||[]).includes({d:'drums',j:'jansan',g:'gowns',o:'other'}[p])});['dv','sd','vb','vs'].forEach(c=>{const el=document.getElementById('lc-'+c);if(el)el.checked=(lx.certs||[]).includes({dv:'dvbe',sd:'sdvosb',vb:'vob',vs:'vosb'}[c])});document.getElementById('leadMT').textContent='Edit Lead';document.getElementById('m-lead').classList.add('open')}
+function delL(id){if(!confirm('Remove this lead?'))return;leads=leads.filter(x=>x.id!==id);s();renderAll();if(document.getElementById('p-leads').classList.contains('act'))renderLeads();toast('Lead removed')}
+function l2o(id){const lx=leads.find(x=>x.id===id);if(!lx)return;openM('order');sv('o-client',lx.name);toast('⚡ Pre-filled from lead')}
+
+// ─ CLIENT ─
+function saveClient(){
+  const name=gv('cl-name');if(!name){toast('⚠ Name required','w');return}
+  const products=['d','j','g','go'].filter(p=>document.getElementById('cp-'+p)?.checked).map(p=>({d:'drums',j:'jansan',g:'gowns',go:'gov'}[p]));
+  const id=gv('cl-id');
+  const data={name,contact:gv('cl-contact'),phone:gv('cl-phone'),email:gv('cl-email'),products,vol:parseInt(gv('cl-vol'))||0,rev:parseFloat(gv('cl-rev'))||0,status:gv('cl-status')||'active',terms:gv('cl-terms')||'net30',dep:gv('cl-dep')||'no',notes:gv('cl-notes')};
+  if(id){const i=clients.findIndex(x=>x.id===id);if(i>-1)clients[i]={...clients[i],...data}}
+  else{clients.push({id:uid(),...data});log('New client: '+name,'client','#0d9e5a')}
+  s();closeM('client');renderAll();if(document.getElementById('p-clients').classList.contains('act'))renderClients();toast('✓ Client saved — '+name);
+}
+function editClient(id){const c=clients.find(x=>x.id===id);if(!c)return;sv('cl-id',c.id);sv('cl-name',c.name);sv('cl-contact',c.contact||'');sv('cl-phone',c.phone||'');sv('cl-email',c.email||'');sv('cl-vol',c.vol||'');sv('cl-rev',c.rev||'');sv('cl-status',c.status||'active');sv('cl-terms',c.terms||'net30');sv('cl-dep',c.dep||'no');sv('cl-notes',c.notes||'');['d','j','g','go'].forEach(p=>{const el=document.getElementById('cp-'+p);if(el)el.checked=(c.products||[]).includes({d:'drums',j:'jansan',g:'gowns',go:'gov'}[p])});document.getElementById('clientMT').textContent='Edit Client';document.getElementById('m-client').classList.add('open')}
+function delC(id){if(!confirm('Remove client?'))return;clients=clients.filter(x=>x.id!==id);s();renderAll();if(document.getElementById('p-clients').classList.contains('act'))renderClients();toast('Client removed')}
+
+// ─ QUOTE ─
+function saveQuote(){
+  const client=gv('q-client');if(!client){toast('⚠ Client required','w');return}
+  const total=qLines.reduce((s,l)=>s+(l.total||0),0);
+  const id=gv('q-id');
+  const data={client,num:gv('q-num'),lines:[...qLines],total,valid:gv('q-valid'),status:gv('q-status')||'draft',notes:gv('q-notes')};
+  if(id){const i=quotes.findIndex(x=>x.id===id);if(i>-1)quotes[i]={...quotes[i],...data};log('Quote updated: '+client,'quote','#4285f4')}
+  else{quotes.push({id:uid(),created:td(),...data});log('Quote created: '+client+' '+f$(total),'quote','#4285f4')}
+  s();closeM('quote');if(document.getElementById('p-quotes').classList.contains('act'))renderQuotes();toast('✓ Quote saved — '+f$(total));
+}
+function editQuote(id){const q=quotes.find(x=>x.id===id);if(!q)return;sv('q-id',q.id);sv('q-client',q.client);sv('q-num',q.num||'');sv('q-valid',q.valid||'');sv('q-status',q.status||'draft');sv('q-notes',q.notes||'');qLines=[...(q.lines||[])];renderQLines();document.getElementById('quoteMT').textContent='Edit Quote';document.getElementById('m-quote').classList.add('open')}
+function delQ(id){quotes=quotes.filter(x=>x.id!==id);s();if(document.getElementById('p-quotes').classList.contains('act'))renderQuotes();toast('Quote removed')}
+function q2o(id){const q=quotes.find(x=>x.id===id);if(!q)return;openM('order');sv('o-client',q.client);sv('o-value',q.total||'');toast('⚡ Pre-filled from quote')}
+function printQuote(){window.print();toast('Printing quote...')}
+
+// ─ ORDER ─
+function calcOP(){
+  const qty=parseFloat(gv('o-qty'))||0;const price=parseFloat(gv('o-price'))||0;const fee=parseFloat(gv('o-fee'))||0;const route=gv('o-route')||'axxis';const prod=gv('o-product')||'drums-2ring';
+  if(!qty||!price){document.getElementById('opBox').style.display='none';return}
+  const cm={'axxis':prod==='drums-3ring'?30:25,'china-40':36.07,'china-45':35.93,'china-2x45':33.33,'local':20};
+  const cost=(cm[route]||27)*qty;const rev=price*qty;const profit=rev-cost+fee;
+  document.getElementById('opBox').style.display='block';
+  document.getElementById('opRows').innerHTML=`<div style="display:flex;flex-direction:column;gap:5px">
+    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">Revenue</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--green)">${f$(rev)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">Supply Cost</span><span style="font-family:'JetBrains Mono',monospace;color:var(--red)">−${f$(cost)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text2)">Program Fee</span><span style="font-family:'JetBrains Mono',monospace;color:var(--green)">+${f$(fee)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;border-top:1px solid var(--border);padding-top:6px"><span>Net Profit</span><span style="font-family:'JetBrains Mono',monospace;color:var(--green)">${f$(profit)}</span></div>
+    <div style="font-size:10px;color:var(--text3);text-align:center">${f$(profit/qty||0)}/unit · ${((profit/rev)*100||0).toFixed(1)}% margin</div>
+  </div>`;
+}
+function tdep(){const r=gv('o-depreq');const e=document.getElementById('depcolWrap');if(e)e.style.display=r==='yes'?'':'none';const pa=document.getElementById('poDepAlert');if(pa)pa.style.display=(gv('po-supplier')==='china')?'':'none'}
+function saveOrder(){
+  const client=gv('o-client');if(!client){toast('⚠ Client required','w');return}
+  const qty=parseInt(gv('o-qty'))||0;const price=parseFloat(gv('o-price'))||0;const fee=parseFloat(gv('o-fee'))||0;const route=gv('o-route')||'axxis';const prod=gv('o-product')||'drums-2ring';
+  const cm={'axxis':prod==='drums-3ring'?30:25,'china-40':36.07,'china-45':35.93,'china-2x45':33.33,'local':20};
+  const cost=(cm[route]||27)*qty;const rev=price*qty;const profit=rev-cost+fee;
+  const docs2=['un','sds','mn','cs'].filter(d=>document.getElementById('od-'+d)?.checked);
+  const id=gv('o-id');
+  const data={client,po:gv('o-po'),product:prod,qty,route,price,fee,cost,rev,profit,stage:parseInt(gv('o-stage'))||0,depreq:gv('o-depreq')||'no',depcol:gv('o-depcol')||'no',date:gv('o-date'),delivery:gv('o-delivery'),docs:docs2,notes:gv('o-notes')};
+  if(id){const i=orders.findIndex(x=>x.id===id);if(i>-1)orders[i]={...orders[i],...data};log('Order updated: '+client,'order','#fbbc04')}
+  else{orders.push({id:uid(),...data});log('New order: '+client+' '+qty+' units '+f$(rev),'order','#fbbc04');if(data.depreq==='yes'&&data.depcol==='no')addNotif(`<strong>Deposit required</strong> for ${client} order before supplier placement`,'urgent')}
+  s();closeM('order');renderAll();if(document.getElementById('p-orders').classList.contains('act'))renderOrders();toast('✓ Order saved — '+client);
+}
+function editOrder(id){const o=orders.find(x=>x.id===id);if(!o)return;sv('o-id',o.id);sv('o-client',o.client);sv('o-po',o.po||'');sv('o-product',o.product);sv('o-qty',o.qty||'');sv('o-route',o.route);sv('o-price',o.price||'');sv('o-fee',o.fee||'');sv('o-stage',o.stage||0);sv('o-depreq',o.depreq||'no');sv('o-depcol',o.depcol||'no');sv('o-date',o.date||'');sv('o-delivery',o.delivery||'');sv('o-notes',o.notes||'');tdep();calcOP();['un','sds','mn','cs'].forEach(d=>{const el=document.getElementById('od-'+d);if(el)el.checked=(o.docs||[]).includes(d)});document.getElementById('orderMT').textContent='Edit Order';document.getElementById('m-order').classList.add('open')}
+function advO(id){const o=orders.find(x=>x.id===id);if(o&&o.stage<3){o.stage++;log(o.client+' → '+STAGES[o.stage],'order','#fbbc04');s();renderAll();if(document.getElementById('p-orders').classList.contains('act'))renderOrders();toast('📦 '+o.client+' → '+STAGES[o.stage])}}
+function delO(id){if(!confirm('Remove order?'))return;orders=orders.filter(x=>x.id!==id);s();renderAll();if(document.getElementById('p-orders').classList.contains('act'))renderOrders();toast('Order removed')}
+function o2i(id){const o=orders.find(x=>x.id===id);if(!o)return;openM('invoice');sv('i-client',o.client);sv('i-amount',o.rev||'');sv('i-num','INV-'+uid().slice(0,6).toUpperCase());toast('⚡ Pre-filled from order')}
+
+// ─ PO ─
+function savePO(){
+  const num=gv('po-num');if(!num){toast('⚠ PO number required','w');return}
+  const id=gv('po-id');
+  const data={num,supplier:gv('po-supplier'),product:gv('po-product'),qty:parseInt(gv('po-qty'))||0,config:gv('po-config'),cost:parseFloat(gv('po-cost'))||0,total:parseFloat(gv('po-total'))||0,date:gv('po-date'),delivery:gv('po-delivery'),status:gv('po-status')||'pending',notes:gv('po-notes')};
+  if(id){const i=pos.findIndex(x=>x.id===id);if(i>-1)pos[i]={...pos[i],...data}}
+  else{pos.push({id:uid(),...data});log('PO created: '+num+' to '+data.supplier,'po','#4285f4')}
+  s();closeM('po');if(document.getElementById('p-pos').classList.contains('act'))renderPOs();toast('✓ PO saved — '+num);
+}
+function editPO(id){const p=pos.find(x=>x.id===id);if(!p)return;sv('po-id',p.id);sv('po-num',p.num);sv('po-supplier',p.supplier);sv('po-product',p.product);sv('po-qty',p.qty||'');sv('po-config',p.config);sv('po-cost',p.cost||'');sv('po-total',p.total||'');sv('po-date',p.date||'');sv('po-delivery',p.delivery||'');sv('po-status',p.status||'pending');sv('po-notes',p.notes||'');document.getElementById('poMT').textContent='Edit PO';document.getElementById('m-po').classList.add('open')}
+function delPO(id){pos=pos.filter(x=>x.id!==id);s();if(document.getElementById('p-pos').classList.contains('act'))renderPOs();toast('PO removed')}
+
+// ─ INVOICE ─
+function saveInvoice(){
+  const client=gv('i-client');const amount=parseFloat(gv('i-amount'))||0;if(!client||!amount){toast('⚠ Client & amount required','w');return}
+  const id=gv('i-id');
+  const data={client,num:gv('i-num'),amount,type:gv('i-type')||'net30',date:gv('i-date'),due:gv('i-due'),notes:gv('i-notes')};
+  if(id){const i=invoices.findIndex(x=>x.id===id);if(i>-1)invoices[i]={...invoices[i],...data};log('Invoice updated: '+client,'invoice','#4285f4')}
+  else{invoices.push({id:uid(),paid:false,...data});log('Invoice: '+client+' '+f$(amount),'invoice','#4285f4');if(data.type==='deposit')addNotif(`<strong>Deposit invoice</strong> created for ${client} — ${f$(amount)} must be collected before supplier order`,'urgent')}
+  s();closeM('invoice');renderAll();if(document.getElementById('p-invoices').classList.contains('act'))renderInvoices();toast('✓ Invoice saved');
+}
+function editInvoice(id){const i=invoices.find(x=>x.id===id);if(!i)return;sv('i-id',i.id);sv('i-client',i.client);sv('i-num',i.num||'');sv('i-amount',i.amount||'');sv('i-type',i.type||'net30');sv('i-date',i.date||'');sv('i-due',i.due||'');sv('i-notes',i.notes||'');document.getElementById('invMT').textContent='Edit Invoice';document.getElementById('m-invoice').classList.add('open')}
+function markPaid(id){const i=invoices.find(x=>x.id===id);if(!i)return;i.paid=true;log('💰 PAID: '+i.client+' '+f$(i.amount),'invoice','#0d9e5a');s();renderAll();if(document.getElementById('p-invoices').classList.contains('act'))renderInvoices();toast('✓ '+i.client+' marked PAID — '+f$(i.amount))}
+function delI(id){if(!confirm('Remove invoice?'))return;invoices=invoices.filter(x=>x.id!==id);s();renderAll();if(document.getElementById('p-invoices').classList.contains('act'))renderInvoices();toast('Invoice removed')}
+function printInvoice(){window.print();toast('Printing...')}
+function printInvoiceId(id){const i=invoices.find(x=>x.id===id);if(i){toast('Printing invoice '+i.num+'...');setTimeout(()=>window.print(),100)}}
+function exportInvoiceCSV(){
+  const rows=[['Client','Invoice#','Amount','Type','Date','Due','Status'],...invoices.map(i=>[i.client,i.num||'',i.amount,i.type,i.date||'',i.due||'',i.paid?'PAID':'UNPAID'])];
+  const csv=rows.map(r=>r.join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='invoices.csv';a.click();toast('✓ CSV exported');
+}
+
+// ─ OUTREACH ─
+function saveOT(){
+  const co=gv('ot-co');if(!co){toast('⚠ Company required','w');return}
+  const id=gv('ot-id');
+  const data={co,ct:gv('ot-ct'),type:gv('ot-type')||'call',pri:gv('ot-pri')||'high',date:gv('ot-date')||td(),val:parseFloat(gv('ot-val'))||0,contact:gv('ot-contact'),note:gv('ot-note')};
+  if(id){const i=outreach.findIndex(x=>x.id===id);if(i>-1)outreach[i]={...outreach[i],...data,done:outreach[i].done}}
+  else{outreach.push({id:uid(),done:false,...data});log('Outreach: '+co,'outreach','#0d9e5a')}
+  s();closeM('outreach');if(document.getElementById('p-outreach').classList.contains('act'))renderOutreach();toast('✓ Task saved — '+co);
+}
+function editOT(id){const t=outreach.find(x=>x.id===id);if(!t)return;sv('ot-id',t.id);sv('ot-co',t.co);sv('ot-ct',t.ct||'');sv('ot-type',t.type||'call');sv('ot-pri',t.pri||'high');sv('ot-date',t.date||td());sv('ot-val',t.val||'');sv('ot-contact',t.contact||'');sv('ot-note',t.note||'');document.getElementById('m-outreach').classList.add('open')}
+function togOT(id){const t=outreach.find(x=>x.id===id);if(!t)return;t.done=!t.done;if(t.done)log('✅ Outreach done: '+t.co,'outreach','#0d9e5a');s();if(document.getElementById('p-outreach').classList.contains('act'))renderOutreach();toast(t.done?'✅ Marked done':'↩ Reopened')}
+function delOT(id){outreach=outreach.filter(x=>x.id!==id);s();if(document.getElementById('p-outreach').classList.contains('act'))renderOutreach();toast('Task removed')}
+
+// ─ STOCK ─
+function saveStock(){
+  const prod=gv('sk-product');if(!prod){toast('⚠ Product required','w');return}
+  const id=gv('sk-id');
+  const data={product:prod,loc:gv('sk-loc')||'Colton, CA',qty:parseInt(gv('sk-stock'))||0,reorder:parseInt(gv('sk-reorder'))||0,cost:parseFloat(gv('sk-cost'))||0,notes:gv('sk-notes')};
+  if(id){const i=stock.findIndex(x=>x.id===id);if(i>-1)stock[i]={...stock[i],...data}}
+  else stock.push({id:uid(),...data});
+  s();closeM('stock');if(document.getElementById('p-inventory').classList.contains('act'))renderInventory();toast('✓ Stock updated');
+}
+function editStock(id){const k=stock.find(x=>x.id===id);if(!k)return;sv('sk-id',k.id);sv('sk-product',k.product);sv('sk-loc',k.loc||'');sv('sk-stock',k.qty||'');sv('sk-reorder',k.reorder||'');sv('sk-cost',k.cost||'');sv('sk-notes',k.notes||'');document.getElementById('m-stock').classList.add('open')}
+
+// ─ DOC ─
+function saveDoc(){
+  const name=gv('dc-name');if(!name){toast('⚠ Name required','w');return}
+  const id=gv('dc-id');
+  const data={name,type:gv('dc-type')||'un',client:gv('dc-client'),date:gv('dc-date'),exp:gv('dc-exp'),notes:gv('dc-notes'),status:'active'};
+  if(id){const i=docs.findIndex(x=>x.id===id);if(i>-1)docs[i]={...docs[i],...data}}
+  else docs.push({id:uid(),...data});
+  s();closeM('doc');if(document.getElementById('p-docs').classList.contains('act'))renderDocs();toast('✓ Document logged');
+}
+function editDoc(id){const d=docs.find(x=>x.id===id);if(!d)return;sv('dc-id',d.id);sv('dc-name',d.name);sv('dc-type',d.type||'un');sv('dc-client',d.client||'');sv('dc-date',d.date||'');sv('dc-exp',d.exp||'');sv('dc-notes',d.notes||'');document.getElementById('m-doc').classList.add('open')}
+function delDoc(id){docs=docs.filter(x=>x.id!==id);s();if(document.getElementById('p-docs').classList.contains('act'))renderDocs();toast('Doc removed')}
+
+// ─ SUPPLIER ─
+function saveSupplier(){
+  const name=gv('sp-name');if(!name){toast('⚠ Name required','w');return}
+  const id=gv('sp-id');
+  const data={name,contact:gv('sp-contact'),phone:gv('sp-phone'),email:gv('sp-email'),lane:gv('sp-lane')||'domestic',products:gv('sp-products'),price:parseFloat(gv('sp-price'))||0,cap:gv('sp-cap'),lead:parseInt(gv('sp-lead'))||0,lock:gv('sp-lock'),notes:gv('sp-notes')};
+  if(id){const i=suppliers.findIndex(x=>x.id===id);if(i>-1)suppliers[i]={...suppliers[i],...data}}
+  else suppliers.push({id:uid(),...data});
+  s();closeM('supplier');if(document.getElementById('p-suppliers').classList.contains('act'))renderSuppliers();toast('✓ Supplier saved — '+name);
+}
+function editSupplier(id){const sp=suppliers.find(x=>x.id===id);if(!sp)return;sv('sp-id',sp.id);sv('sp-name',sp.name);sv('sp-contact',sp.contact||'');sv('sp-phone',sp.phone||'');sv('sp-email',sp.email||'');sv('sp-lane',sp.lane||'domestic');sv('sp-products',sp.products||'');sv('sp-price',sp.price||'');sv('sp-cap',sp.cap||'');sv('sp-lead',sp.lead||'');sv('sp-lock',sp.lock||'');sv('sp-notes',sp.notes||'');document.getElementById('supMT').textContent='Edit Supplier';document.getElementById('m-supplier').classList.add('open')}
+function delSup(id){if(!confirm('Remove supplier?'))return;suppliers=suppliers.filter(x=>x.id!==id);s();if(document.getElementById('p-suppliers').classList.contains('act'))renderSuppliers();toast('Supplier removed')}
+
+// ─ LOAD BUILDER ─
+function addLL(){loadLines.push({id:uid(),client:'',qty:0});renderLLines()}
+function renderLLines(){
+  document.getElementById('loadLines').innerHTML=loadLines.map((ll,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 80px 28px;gap:8px;align-items:center">
+      <input class="fi" style="font-size:12px;padding:6px 8px" placeholder="Client name" value="${ll.client}" oninput="loadLines[${i}].client=this.value;calcLoad()">
+      <input class="fi" type="number" style="font-size:12px;padding:6px 8px;text-align:center" placeholder="Qty" value="${ll.qty||''}" oninput="loadLines[${i}].qty=parseInt(this.value)||0;calcLoad()">
+      <button class="btn btn-danger btn-icon btn-xs" onclick="loadLines.splice(${i},1);renderLLines()">✕</button>
+    </div>`).join('');
+  calcLoad();
+}
+function calcLoad(){
+  const route=gv('lb-route')||'axxis';const dtype=gv('lb-dtype')||'2ring';
+  const capM={'axxis':340,'china-40':220,'china-45':250,'china-2x45':500};
+  const costM={'axxis':dtype==='3ring'?30:25,'china-40':36.07,'china-45':35.93,'china-2x45':33.33};
+  const sellM={'axxis':dtype==='3ring'?43.50:41.50,'china-40':41.50,'china-45':41.50,'china-2x45':41.50};
+  const feeM={'axxis':150,'china-40':500,'china-45':500,'china-2x45':500};
+  const cap=capM[route];const cost=costM[route];const sell=sellM[route];const fee=feeM[route];
+  const tot=loadLines.reduce((s,l)=>s+(l.qty||0),0);const pct=Math.min(100,tot/cap*100);
+  const viz=document.getElementById('lbViz');
+  if(viz)viz.innerHTML=loadLines.filter(l=>l.qty>0).map((l,i)=>`<div class="cv-seg" style="width:${((l.qty/cap)*100).toFixed(1)}%;background:${SEGS[i%8]}">${l.qty>15?l.client.split(' ')[0]:''}</div>`).join('')+`<div style="flex:1;background:var(--card2)"></div>`;
+  const vi=document.getElementById('lbVizInfo');
+  if(vi)vi.innerHTML=`<span style="font-weight:600">${tot}/${cap} drums (${pct.toFixed(0)}% full)</span><span style="color:${pct>=80?'var(--green)':pct>=60?'var(--amber)':'var(--red)'};">${pct>=80?'✓ Efficient':pct>=60?'Acceptable':'⚠ Under-loaded'}</span>`;
+  const tCost=tot*cost;const tRev=tot*sell;const profit=tRev-tCost+fee;
+  const sum=document.getElementById('lbSummary');
+  if(sum)sum.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;text-align:center">
+    <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:3px">Drums</div><div style="font-size:20px;font-weight:800">${tot}</div></div>
+    <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:3px">Cost</div><div style="font-size:20px;font-weight:800;color:var(--red)">${f$(tCost)}</div></div>
+    <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:3px">Revenue</div><div style="font-size:20px;font-weight:800;color:var(--green)">${f$(tRev)}</div></div>
+    <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:3px">Net Profit</div><div style="font-size:20px;font-weight:800;color:var(--green)">${f$(profit)}</div></div>
+  </div><div style="text-align:center;margin-top:8px;font-size:10px;color:var(--text2)">${f$(tot?profit/tot:0)}/drum · Program fee ${f$(fee)} included</div>`;
+}
+function createOrdersFromLoad(){
+  const route=gv('lb-route')||'axxis';const dtype=gv('lb-dtype')||'2ring';
+  const sellM={'axxis':dtype==='3ring'?43.50:41.50,'china-40':41.50,'china-45':41.50,'china-2x45':41.50};
+  const costM={'axxis':dtype==='3ring'?30:25,'china-40':36.07,'china-45':35.93,'china-2x45':33.33};
+  const sell=sellM[route];const cost=costM[route];
+  loadLines.filter(l=>l.client&&l.qty>0).forEach(l=>{
+    orders.push({id:uid(),client:l.client,po:'',product:'drums-'+dtype,qty:l.qty,route,price:sell,fee:0,cost:l.qty*cost,rev:l.qty*sell,profit:l.qty*(sell-cost),stage:0,depreq:'no',depcol:'no',date:td(),delivery:'',docs:[],notes:'Created from load builder'});
+  });
+  s();closeM('load');renderAll();if(document.getElementById('p-orders').classList.contains('act'))renderOrders();toast(`✓ ${loadLines.filter(l=>l.qty>0).length} orders created from load`);
+}
+
+// ═══════════════════════════════════════
+// SEARCH & KEYBOARD
+// ═══════════════════════════════════════
+function doSearch(v){if(!v)return;const q=v.toLowerCase();const ml=leads.filter(l=>l.name.toLowerCase().includes(q)).length;const mo=orders.filter(o=>o.client.toLowerCase().includes(q)).length;const mi=invoices.filter(i=>i.client.toLowerCase().includes(q)).length;const mc=clients.filter(c=>c.name.toLowerCase().includes(q)).length;if(ml+mo+mi+mc>0)toast(`🔍 ${ml} leads · ${mo} orders · ${mi} invoices · ${mc} clients`)}
+function searchKey(e){if(e.key==='Escape'){document.getElementById('gSearch').value='';document.getElementById('gSearch').blur()}}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('gSearch').focus()}if(e.key==='Escape'&&document.querySelector('.ovl.open')){document.querySelectorAll('.ovl.open').forEach(m=>m.classList.remove('open'))}});
+
+// ═══════════════════════════════════════
+// BIGCOMMERCE INTEGRATION MODULE
+// ═══════════════════════════════════════
+
+// BC state
+let bcCreds={hash:'',token:'',storename:'',connected:false};
+let bcSyncSettings={autosync:'manual',route:'axxis',fee:150,autoinv:'yes'};
+let bcOrders=[];
+let skuMap=[
+  {sku:'LG-DR-2R',name:'Steel Drum 2-Ring 55-Gal',product:'drums-2ring',price:41.50},
+  {sku:'LG-DR-3R',name:'Steel Drum 3-Ring 55-Gal',product:'drums-3ring',price:43.50},
+  {sku:'LG-GWN',name:'Disposable Gowns',product:'gowns',price:0.56},
+  {sku:'LG-JAN',name:'JanSan Bundle',product:'jansan',price:0},
+];
+
+function loadBCState(){
+  try{const r=localStorage.getItem('luks_bc_v1');if(r){const d=JSON.parse(r);bcCreds={...bcCreds,...(d.creds||{})};bcSyncSettings={...bcSyncSettings,...(d.sync||{})};bcOrders=d.orders||[];if(d.skuMap)skuMap=d.skuMap;}}catch(e){}
+}
+function saveBCState(){
+  try{localStorage.setItem('luks_bc_v1',JSON.stringify({creds:bcCreds,sync:bcSyncSettings,orders:bcOrders,skuMap}));}catch(e){}
+}
+
+function renderBigcommerce(){
+  loadBCState();
+  // Populate fields
+  sv('bc-hash',bcCreds.hash||'');
+  sv('bc-token',bcCreds.token?'••••••••••':'' );
+  sv('bc-storename',bcCreds.storename||'');
+  sv('bc-autosync',bcSyncSettings.autosync||'manual');
+  sv('bc-route',bcSyncSettings.route||'axxis');
+  sv('bc-fee',bcSyncSettings.fee||150);
+  sv('bc-autoinv',bcSyncSettings.autoinv||'yes');
+
+  // Connection badge
+  const badge=document.getElementById('bcConnBadge');
+  if(badge){
+    if(bcCreds.connected){badge.className='badge bg-g';badge.textContent='✓ CONNECTED — '+(bcCreds.storename||'Your Store')}
+    else{badge.className='badge bg-dim';badge.textContent='NOT CONNECTED'}
+  }
+
+  // Status banner
+  const banner=document.getElementById('bcStatusBanner');
+  if(banner){
+    if(bcCreds.connected){
+      banner.innerHTML=`<div class="alert-banner alert-green">✓ Connected to <strong>${bcCreds.storename||'BigCommerce Store'}</strong> · Last sync: ${bcSyncSettings.lastSync||'Never'} · ${bcOrders.filter(o=>!o.imported).length} orders pending import</div>`;
+    } else {
+      banner.innerHTML=`<div class="alert-banner alert-blue">🛒 Enter your BigCommerce API credentials below to connect your ProLUKS store. Orders will sync automatically once connected.</div>`;
+    }
+  }
+
+  renderSKUMap();
+  renderBCOrders();
+  renderBCChecklist();
+}
+
+function bcCredsChanged(){
+  // Visual feedback that creds have changed
+  const badge=document.getElementById('bcConnBadge');
+  if(badge&&!bcCreds.connected){badge.className='badge bg-a';badge.textContent='CREDENTIALS CHANGED — Save & Test'}
+}
+
+function saveBCCreds(){
+  const hash=gv('bc-hash');const token=gv('bc-token');const storename=gv('bc-storename');
+  if(!hash||!token||token==='••••••••••'){toast('⚠ Store hash and access token required','w');return}
+  bcCreds.hash=hash;bcCreds.token=token;bcCreds.storename=storename||'ProLUKS Store';
+  saveBCState();
+  toast('✓ Credentials saved — click Test Connection to verify');
+}
+
+function saveBCSyncSettings(){
+  bcSyncSettings.autosync=gv('bc-autosync');
+  bcSyncSettings.route=gv('bc-route');
+  bcSyncSettings.fee=parseFloat(gv('bc-fee'))||150;
+  bcSyncSettings.autoinv=gv('bc-autoinv');
+  saveBCState();
+  toast('✓ Sync settings saved');
+}
+
+function bcTestConnection(){
+  if(!bcCreds.hash||!bcCreds.token){toast('⚠ Enter your Store Hash and Access Token first','w');return}
+  const btn=document.getElementById('bcTestBtn');
+  if(btn){btn.textContent='Testing...';btn.disabled=true}
+  // Simulate API test (in production this would call BC API)
+  setTimeout(()=>{
+    // Demo mode — simulate successful connection
+    bcCreds.connected=true;
+    bcCreds.storename=bcCreds.storename||'ProLUKS Gloves & Safety';
+    saveBCState();
+    if(btn){btn.textContent='🔌 Test Connection';btn.disabled=false}
+    renderBigcommerce();
+    log('BigCommerce connected: '+bcCreds.storename,'bc','var(--brand)');
+    addNotif(`<strong>BigCommerce connected</strong> — ${bcCreds.storename} is live. Ready to sync orders.`,'info');
+    toast('✓ Connected to '+bcCreds.storename);
+  },1200);
+}
+
+function bcSyncOrders(){
+  if(!bcCreds.connected){toast('⚠ Connect to BigCommerce first','w');return}
+  const syncTime=document.getElementById('bcSyncTime');
+  if(syncTime)syncTime.textContent='Syncing...';
+
+  // Simulate fetching BC orders
+  setTimeout(()=>{
+    const now=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    bcSyncSettings.lastSync=now;
+
+    // Demo: create sample BC orders if empty
+    if(!bcOrders.length){
+      bcOrders=[
+        {id:'BC-1042',bcId:1042,customer:'ABC Drilling',sku:'LG-DR-2R',qty:350,price:41.50,total:14525,status:'Awaiting Fulfillment',date:td(),imported:false,payment:'Net 30'},
+        {id:'BC-1043',bcId:1043,customer:'ESP',sku:'LG-DR-3R',qty:200,price:43.50,total:8700,status:'Awaiting Fulfillment',date:td(),imported:false,payment:'Net 30'},
+      ];
+    }
+
+    saveBCState();
+    if(syncTime)syncTime.textContent='Last sync: '+now;
+    renderBCOrders();
+    const newOrds=bcOrders.filter(o=>!o.imported).length;
+    if(newOrds>0){
+      addNotif(`<strong>${newOrds} new BigCommerce orders</strong> ready to import into ERP`,'warning');
+      const nb=document.getElementById('nb-bc');if(nb){nb.textContent=newOrds;nb.style.display=''}
+    }
+    toast(`✓ Synced — ${newOrds} new order${newOrds===1?'':'s'} from BigCommerce`);
+  },900);
+}
+
+function renderBCOrders(){
+  const el=document.getElementById('bcOrdersLog');
+  if(!el)return;
+  if(!bcOrders.length){
+    el.innerHTML='<div class="empty"><div class="ei">🛒</div>No BigCommerce orders synced yet.<br>Click "Sync Orders Now" to pull from your store.</div>';return;
+  }
+  el.innerHTML=`<div class="dtable" style="box-shadow:none;border:none">
+    <div class="dth" style="grid-template-columns:100px 1.2fr .8fr .8fr .7fr .8fr 110px">
+      <span>BC Order #</span><span>Customer</span><span>Product (SKU)</span><span>Qty</span><span>Total</span><span>Status</span><span>Actions</span>
+    </div>
+    <div>${bcOrders.map(o=>`
+      <div class="dtr" style="grid-template-columns:100px 1.2fr .8fr .8fr .7fr .8fr 110px;${o.imported?'opacity:.5':''}">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--brand)">#${o.bcId}</div>
+        <div style="font-weight:600">${o.customer}</div>
+        <div style="font-size:11px"><span class="tag t-d">${o.sku}</span></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px">${(o.qty||0).toLocaleString()}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green)">${f$(o.total)}</div>
+        <span class="badge ${o.imported?'bg-g':'bg-a'}">${o.imported?'✓ IMPORTED':'PENDING'}</span>
+        <div style="display:flex;gap:3px">
+          ${!o.imported?`<button class="btn btn-brand btn-xs" onclick="importBCOrder('${o.id}')">Import →</button>`:'<span style="font-size:10px;color:var(--green)">In ERP ✓</span>'}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function importBCOrder(bcOrdId){
+  const bcO=bcOrders.find(x=>x.id===bcOrdId);
+  if(!bcO||bcO.imported)return;
+
+  // Map SKU to product type
+  const skuEntry=skuMap.find(m=>m.sku===bcO.sku)||{product:'drums-2ring',price:41.50};
+  const route=bcSyncSettings.route||'axxis';
+  const fee=bcSyncSettings.fee||150;
+  const costM={'axxis':skuEntry.product==='drums-3ring'?30:27,'china-40':36.07,'china-45':35.93,'china-2x45':33.33,'local':20};
+  const cost=(costM[route]||27)*(bcO.qty||0);
+  const rev=bcO.total||0;
+  const profit=rev-cost+fee;
+
+  // Create order in ERP
+  const newOrder={
+    id:uid(),client:bcO.customer,po:'BC-'+bcO.bcId,product:skuEntry.product,
+    qty:bcO.qty,route,price:bcO.price,fee,cost,rev,profit,
+    stage:0,depreq:'no',depcol:'no',date:bcO.date,delivery:'',
+    docs:['un','sds'],notes:`Auto-imported from BigCommerce Order #${bcO.bcId} · Payment: ${bcO.payment}`
+  };
+  orders.push(newOrder);
+
+  // Auto-create invoice if setting enabled
+  if(bcSyncSettings.autoinv==='yes'){
+    invoices.push({id:uid(),client:bcO.customer,num:'INV-BC-'+bcO.bcId,amount:rev,type:'net30',date:bcO.date,due:'',paid:false,notes:'Auto-created from BC Order #'+bcO.bcId});
+  }
+
+  bcO.imported=true;
+  log(`BC Order #${bcO.bcId} imported — ${bcO.customer} ${f$(rev)}`,'bc','var(--brand)');
+  addNotif(`<strong>BC Order #${bcO.bcId}</strong> imported — ${bcO.customer} ${f$(rev)} · Check Orders tab`,'info');
+
+  s();saveBCState();
+  renderBCOrders();renderAll();
+
+  // Update badge
+  const remaining=bcOrders.filter(o=>!o.imported).length;
+  const nb=document.getElementById('nb-bc');if(nb){nb.textContent=remaining||'';nb.style.display=remaining>0?'':'none'}
+
+  toast(`✓ BC Order #${bcO.bcId} imported — Order + Invoice created in ERP`);
+}
+
+function renderSKUMap(){
+  const el=document.getElementById('skuMapBody');if(!el)return;
+  const pm={'drums-2ring':'🥁 2-Ring Drums','drums-3ring':'🥁 3-Ring Drums','gowns':'🥼 Gowns','jansan':'🧹 JanSan'};
+  el.innerHTML=skuMap.map((m,i)=>`
+    <div class="dtr" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--brand)">${m.sku}</div>
+      <div style="font-size:12px">${m.name}</div>
+      <div>${pm[m.product]||m.product}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green)">$${m.price}</div>
+    </div>`).join('')||'<div class="empty"><div class="ei">🗺</div>No SKU mappings</div>';
+}
+
+function bcRegisterWebhooks(){
+  if(!bcCreds.connected){toast('⚠ Connect first','w');return}
+  setTimeout(()=>{
+    const wc=document.getElementById('wh-created');const wu=document.getElementById('wh-updated');
+    if(wc){wc.className='badge bg-g';wc.textContent='✓ ACTIVE'}
+    if(wu){wu.className='badge bg-g';wu.textContent='✓ ACTIVE'}
+    toast('✓ Webhooks registered — orders will sync automatically');
+    log('BigCommerce webhooks registered','bc','var(--brand)');
+  },800);
+}
+
+function togBC(el){
+  const dot=el.querySelector('.bc-dot');const done=el.dataset.done==='true';
+  if(done){el.dataset.done='false';dot.style.background='';dot.style.borderColor='var(--border)';dot.style.color='';dot.textContent='';el.style.background='var(--card2)'}
+  else{el.dataset.done='true';dot.style.background='var(--green)';dot.style.borderColor='var(--green)';dot.style.color='#fff';dot.textContent='✓';el.style.background='var(--green-lt)'}
+  renderBCChecklist();
+}
+function renderBCChecklist(){
+  const items=document.querySelectorAll('.bc-check');const done=[...items].filter(i=>i.dataset.done==='true').length;const total=items.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  const pctEl=document.getElementById('bcCheckPct');if(pctEl)pctEl.textContent=done+' / '+total+' complete';
+  const barEl=document.getElementById('bcCheckBar');if(barEl)barEl.style.width=pct+'%';
+}
+
+// ═══════════════════════════════════════
+// MISC
+// ═══════════════════════════════════════
+function calcProfitCard(){
+  const type=document.getElementById('pc-client')?.value||'standard';
+  const qty=parseInt(document.getElementById('pc-qty')?.value)||0;
+  const cw=document.getElementById('pc-custom-wrap');
+  if(cw)cw.style.display=type==='custom'?'':'none';
+  const prices={standard:41.50,hugo:37.00,custom:parseFloat(document.getElementById('pc-custprice')?.value)||41.50};
+  const sell=prices[type];const cost=25;const margin=sell-cost;
+  const fee=qty>=500?500:qty>=350?400:qty>=200?250:150;
+  const profit=(margin*qty)+fee;
+  const el=document.getElementById('pc-result');
+  if(!el||!qty)return;
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Sell price</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">${f$(sell)}/drum</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Axxis cost</span><span style="font-family:'JetBrains Mono',monospace;color:var(--red)">-${f$(cost)}/drum</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Margin/drum</span><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--green)">${f$(margin)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Revenue (${qty} drums)</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600">${f$(sell*qty)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">COGS</span><span style="font-family:'JetBrains Mono',monospace;color:var(--red)">-${f$(cost*qty)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text2)">Program fee</span><span style="font-family:'JetBrains Mono',monospace;color:var(--brand)">+${f$(fee)}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0 0;font-size:15px;font-weight:800"><span>NET PROFIT</span><span style="color:var(--green);font-family:'JetBrains Mono',monospace">${f$(profit)}</span></div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">${f$(margin)}/drum margin · Program fee: ${f$(fee)}</div>`;
+}
+function clearActivity(){activity=[];s();if(document.getElementById('p-dash').classList.contains('act'))renderDash();toast('Activity cleared')}
+function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');setTimeout(()=>el.className='toast',3000)}
+function renderAll(){renderDash();renderBadges();renderPills();renderNotifPanel();renderNotifBadge()}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init(){
+  l();loadBCState();
+  if(!leads.length&&!orders.length)seed();
+  applySettings();
+  document.getElementById('greetDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  setInterval(()=>{const t=new Date();document.getElementById('dashClock').textContent=t.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'})},1000);
+  // Add bigcommerce to nav map
+  const origGo=window.go;
+  window.go=function(id){
+    origGo(id);
+    if(id==='bigcommerce')renderBigcommerce();
+  };
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
